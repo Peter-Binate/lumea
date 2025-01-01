@@ -1,0 +1,9 @@
+.pnpm
+.next
+dist
+node_modules
+*.log
+build
+.env*
+*.tmp
+*.md
