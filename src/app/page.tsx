@@ -1,9 +1,26 @@
-import Image from 'next/image';
+import FoodCard from '@/app/components/cards/food/FoodCard';
+import { mockFoodCardProps } from '@/app/components/cards/food/FoodCard.mocks';
+import PrimaryLayout from '@/app/components/layouts/primary/PrimaryLayout';
+import SidebarLayout from '@/app/components/layouts/sidebar/SidebarLayout';
+import { NextPageWithLayout } from '@/app/page';
+import styles from '@/app/page.module.css';
 
-export default function Home() {
+const Home: NextPageWithLayout = () => {
   return (
-    <div>
-      <h1>test2</h1>
-    </div>
+    <section className={styles.main}>
+      <h1 className={styles.title}>Bienvenue !</h1>
+      <FoodCard {...mockFoodCardProps.base} />
+    </section>
   );
-}
+};
+
+export default Home;
+
+Home.getLayout = (page) => {
+  return (
+    <PrimaryLayout>
+      <SidebarLayout />
+      {page}
+    </PrimaryLayout>
+  );
+};
