@@ -1,8 +1,4 @@
-import PrimaryLayout from '@/app/components/layouts/primary/PrimaryLayout';
-import SidebarLayout from '@/app/components/layouts/sidebar/SidebarLayout';
-import { NextPageWithLayout } from './page';
-
-const About: NextPageWithLayout = () => {
+export default function About() {
   return (
     <section>
       <h2>Exemple de mise en page</h2>
@@ -33,15 +29,4 @@ const About: NextPageWithLayout = () => {
       </p>
     </section>
   );
-};
-
-export default About;
-
-About.getLayout = (page) => {
-  return (
-    <PrimaryLayout>
-      <SidebarLayout />
-      {page}
-    </PrimaryLayout>
-  );
-};
+}
