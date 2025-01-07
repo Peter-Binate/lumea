@@ -1,11 +1,11 @@
 // Représentation des données pour une requête de connexion
-export interface LoginRequest {
+export interface LoginFormData {
   email: string;
   password: string;
 }
 
 // Représentation des données pour une requête d'inscription
-export interface RegisterRequest {
+export interface RegisterFormData {
   name: string;
   email: string;
   password: string;
@@ -22,11 +22,11 @@ export interface AuthResponse {
 }
 
 // Définition des types pour la récupération du mot de passe
-export interface ForgotPasswordRequest {
+export interface ForgotPasswordFormData {
   email: string;
 }
 
-export interface ResetPasswordRequest {
+export interface ResetPasswordFormData {
   token: string;
   newPassword: string;
 }

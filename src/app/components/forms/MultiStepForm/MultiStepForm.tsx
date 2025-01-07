@@ -1,62 +1,97 @@
 'use client';
-import { RegisterRequest } from '@/types/auth';
-// import { yupResolver } from '@hookform/resolvers/yup';
-import dynamic from 'next/dynamic';
+import { RegisterFormData } from '@/types/auth';
 import { useState } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
+import FirstStep from './steps/FirstStep/FirstStep';
+import LastStep from './steps/LastStep/LastStep';
+import SecondStep from './steps/SecondStep/SecondStep';
 // import ProgressBar from './ProgressBar';
 
-// Dynamically load steps
-const FirstStep = dynamic(() => import('./steps/FirstStep/FirstStep'));
-const SecondStep = dynamic(() => import('./steps/SecondStep/SecondStep'));
-const LastStep = dynamic(() => import('./steps/LastStep/LastStep'));
+interface MultiStepFormProps {
+  onSubmit: (data: RegisterFormData) => void;
+}
 
-const MultiStepForm = () => {
-  const steps = [FirstStep, SecondStep, LastStep];
-  const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState<RegisterRequest>(
-    {} as RegisterRequest
-  );
+const MultiStepForm: React.FC<MultiStepFormProps> = ({ onSubmit }) => {
+  // État pour suivre l'étape actuelle du formulaire
+  const [currentStep, setCurrentStep] = useState(1);
 
-  const methods = useForm<RegisterRequest>({
-    defaultValues: formData,
-    // resolver: yupResolver(
-    //   [firstStepSchema, secondStepSchema, lastStepSchema][currentStep]
-    // ),
+  // État pour stocker toutes les données du formulaire
+  const [formData, setFormData] = useState<RegisterFormData>({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    rentalsNumber: [],
+    additionalRentals: 0,
   });
 
-  const onSubmit = methods.handleSubmit((data) => {
-    if (currentStep < steps.length - 1) {
-      setFormData({ ...formData, ...data });
-      setCurrentStep((prev) => prev + 1);
-    } else {
-      console.log('Final data:', { ...formData, ...data });
+  const handleNextStep = () => {
+    setCurrentStep((prev) => Math.min(prev + 1, 3)); // Limites à 3 étapes
+  };
+
+  const handleBackStep = () => {
+    setCurrentStep((prev) => Math.max(prev - 1, 1)); // Ne descend pas en dessous de 1 étape
+  };
+
+  // Fonction pour mettre à jour les données du formulaire
+  const updateFormData = (data: Partial<RegisterFormData>) => {
+    setFormData((prev) => ({ ...prev, ...data }));
+    console.log('Updated form data:', formData);
+  };
+
+  const handleSubmit = () => {
+    console.log('Final form data:', formData);
+    onSubmit(formData);
+  };
+
+  // Ajout d'un console.log pour voir l'étape courante
+  console.log('Current step:', currentStep);
+
+  // Fonction pour rendre l'étape actuelle
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <FirstStep
+            formData={formData}
+            updateFormData={updateFormData}
+            onNext={handleNextStep}
+          />
+        );
+      case 2:
+        return (
+          <SecondStep
+            formData={formData}
+            updateFormData={updateFormData}
+            onNext={handleNextStep}
+            onPrev={handleBackStep}
+          />
+        );
+      case 3:
+        return (
+          <LastStep
+            formData={formData}
+            updateFormData={updateFormData}
+            onNext={handleNextStep}
+            onPrev={handleBackStep}
+            onSubmit={handleSubmit}
+          />
+        );
+      default:
+        // On retourne FirstStep par défaut
+        return (
+          <FirstStep
+            formData={formData}
+            updateFormData={updateFormData}
+            onNext={handleNextStep}
+          />
+        );
     }
-  });
-
-  const StepComponent = steps[currentStep];
-
+  };
   return (
-    <FormProvider {...methods}>
-      <form onSubmit={onSubmit} className="space-y-4">
-        {/* <ProgressBar currentStep={currentStep + 1} totalSteps={steps.length} /> */}
-        <StepComponent />
-        <div className="flex justify-between">
-          {currentStep > 0 && (
-            <button
-              type="button"
-              onClick={() => setCurrentStep((prev) => prev - 1)}
-              className="btn btn-secondary"
-            >
-              Back
-            </button>
-          )}
-          <button type="submit" className="btn btn-primary">
-            {currentStep === steps.length - 1 ? 'Submit' : 'Next'}
-          </button>
-        </div>
-      </form>
-    </FormProvider>
+    <div className="w-full max-w-md mx-auto">
+      {/* <ProgressBar currentStep={currentStep} totalSteps={3} /> */}
+      {renderStep()}
+    </div>
   );
 };
 
