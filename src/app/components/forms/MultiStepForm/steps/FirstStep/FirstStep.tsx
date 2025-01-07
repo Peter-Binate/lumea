@@ -45,7 +45,10 @@ const FirstStep: React.FC<FirstStepProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmitStep)} className="space-y-4">
+    <form
+      onSubmit={handleSubmit(onSubmitStep)}
+      className="border-2 border-red-500 space-y-4"
+    >
       {/* Champ Nom */}
       <div>
         <input

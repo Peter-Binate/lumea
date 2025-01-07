@@ -20,8 +20,7 @@ const MultiStepForm: React.FC<MultiStepFormProps> = ({ onSubmit }) => {
     email: '',
     password: '',
     confirmPassword: '',
-    rentalsNumber: [],
-    additionalRentals: 0,
+    rentalsNumber: 0,
   });
 
   const handleNextStep = () => {
@@ -88,7 +87,7 @@ const MultiStepForm: React.FC<MultiStepFormProps> = ({ onSubmit }) => {
     }
   };
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div className="w-full">
       {/* <ProgressBar currentStep={currentStep} totalSteps={3} /> */}
       {renderStep()}
     </div>
