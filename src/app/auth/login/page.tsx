@@ -104,7 +104,7 @@ const LoginPage = () => {
           />
 
           {/* Lien "Mot de passe oublié" */}
-          <Link href="password_reset" className="block text-right">
+          <Link href="../password_reset" className="block text-right">
             <p className="text-base text-gray-500 font-normal">
               Mot de passe oublié ?
             </p>

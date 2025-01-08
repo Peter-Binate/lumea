@@ -1,10 +1,13 @@
 'use client';
+import ProgressBar from '@/app/components/ui/ProgressBar';
 import { RegisterFormData } from '@/types/auth';
+import Link from 'next/link';
 import { useState } from 'react';
+import LogoImage from '../../ui/LogoImage';
+import ProfileImage from '../../ui/ProfileImage';
 import FirstStep from './steps/FirstStep/FirstStep';
 import LastStep from './steps/LastStep/LastStep';
 import SecondStep from './steps/SecondStep/SecondStep';
-// import ProgressBar from './ProgressBar';
 
 interface MultiStepFormProps {
   onSubmit: (data: RegisterFormData) => void;
@@ -87,9 +90,17 @@ const MultiStepForm: React.FC<MultiStepFormProps> = ({ onSubmit }) => {
     }
   };
   return (
-    <div className="w-full">
-      {/* <ProgressBar currentStep={currentStep} totalSteps={3} /> */}
+    <div className="w-[604px] mt-12">
+      <div className="text-center">
+        <ProgressBar currentStep={currentStep} totalSteps={3} />
+        <ProfileImage />
+      </div>
+
       {renderStep()}
+      <div className="mt-[20px] text-center text-[#5261ab] text-base font-normal font-inter underline leading-[30px]">
+        <Link href="auth/login">Vous avez déjà un compte ?</Link>
+      </div>
+      <LogoImage />
     </div>
   );
 };

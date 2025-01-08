@@ -3,6 +3,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
+import SubmitButton from './SubmitButton';
 
 // Définition du schéma de validation
 const otpSchema = yup.object().shape({
@@ -127,13 +128,12 @@ const InputOtp = ({ length = 4 }: InputOtpProps) => {
         </span>
       </div>
 
-      <button
+      <SubmitButton
+        text="Se connecter"
         type="submit"
-        className="w-full mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg
-                hover:bg-blue-700 transition-colors"
-      >
-        Se connecter
-      </button>
+        variant="primary"
+        className="mt-4"
+      />
     </form>
   );
 };
