@@ -1,5 +1,5 @@
 import { RegisterFormData } from '@/types/auth';
-import { firstStepSchema } from '@/utils/validation';
+import { firstStepSchema } from '@/utils/validation/auth/register.schema';
 import { yupResolver } from '@hookform/resolvers/yup';
 import React from 'react';
 import { useForm } from 'react-hook-form';
