@@ -1,7 +1,9 @@
-export default function About() {
+export default function Portfolio() {
   return (
     <section>
-      <h2>Exemple de mise en page</h2>
+      <h1 className="text-slate-900 text-[28px] font-semibold">
+        🏠 Portefeuilles
+      </h1>
       <p>
         Cet exemple ajoute une propriété getLayout à votre page, vous permettant
         de renvoyer un composant React pour la mise en page. Cela vous permet de

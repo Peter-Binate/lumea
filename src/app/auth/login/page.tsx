@@ -1,21 +1,38 @@
+// src/app/auth/login/page.tsx
 'use client';
 
+// Imports des dépendances nécessaires
 import Input from '@/app/components/ui/Input';
+import { useAuth } from '@/app/contexts/AuthContext';
 import { LoginFormData } from '@/types/auth';
 import { loginSchema } from '@/utils/validation/auth/login.schema';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-const LoginPage = () => {
-  // États et hooks
-  const router = useRouter();
+export default function LoginPage() {
+  // États locaux pour gérer le chargement et les erreurs
   const [isLoading, setIsLoading] = useState(false);
   const [globalError, setGlobalError] = useState<string | null>(null);
+  //État isRedirecting pour éviter les redirections multiples
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
+  // Hooks pour l'authentification et la navigation
+  const { login, isAuthenticated } = useAuth();
+  const router = useRouter();
+
+  // Gestion de la redirection si déjà authentifié
+  useEffect(() => {
+    if (isAuthenticated && !isRedirecting) {
+      setIsRedirecting(true);
+      router.push('/dashboard');
+    }
+  }, [isAuthenticated, router, isRedirecting]);
+
+  // Configuration du formulaire avec react-hook-form et validation yup
   const {
     register,
     handleSubmit,
@@ -25,47 +42,82 @@ const LoginPage = () => {
     mode: 'onChange',
   });
 
-  const handleLogin = async (data: LoginFormData) => {
+  // Réinitialisation du formulaire en cas d'erreur
+  useEffect(() => {
+    if (globalError) {
+      const timer = setTimeout(() => {
+        setGlobalError(null);
+      }, 5000); // L'erreur disparaît après 5 secondes
+
+      return () => clearTimeout(timer);
+    }
+  }, [globalError]);
+
+  // Gestionnaire de soumission du formulaire
+  const onSubmit = async (data: LoginFormData) => {
     try {
+      // Active l'état de chargement et réinitialise les erreurs
       setIsLoading(true);
       setGlobalError(null);
 
       //On vérifie que le formualire est valide
       if (!isValid) {
-        setGlobalError('email ou mot de passe invalide');
+        setGlobalError('Email ou mot de passe invalide');
         return;
       }
 
-      // TODO: Appel à l'API qui sera implémenté plus tard
-      // Cette partie sera déplacée dans un service d'authentification
       console.log('Données de connexion:', data);
 
-      // Simulation d'une attente pour démonstration
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      if (
-        data.email !== 'test@example.com' ||
-        data.password !== 'password123'
-      ) {
-        setGlobalError('Email ou mot de passe incorrect');
-        return;
-      }
-
-      // Redirection après connexion réussie
-      router.push('/dashboard');
+      // Tentative de connexion
+      await login(data.email, data.password);
     } catch (error) {
+      // Gestion des erreurs
       console.error('Erreur de connexion:', error);
-      setGlobalError('Une erreur est survenue lors de la connexion');
+      setGlobalError('Email ou mot de passe incorrect');
+      //reset({password: ''}); // Réinitialise uniquement le mot de passe
     } finally {
+      // Désactive l'état de chargement dans tous les cas
       setIsLoading(false);
     }
   };
 
+  // Si une redirection est en cours, afficher un écran de chargement
+  if (isRedirecting) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <svg
+            className="animate-spin h-10 w-10 text-blue-600 mx-auto mb-4"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          <p className="text-gray-600">Redirection en cours...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
+    // Container principal avec mise en page responsive
     <div className="mt-10 max-w-screen-lg sm:max-w-full min-h-screen overflow-hidden flex flex-col lg:flex-row items-center justify-center">
-      {/* Section gauche : formulaire */}
+      {/* Section gauche : Formulaire de connexion */}
       <div className="flex-1 max-w-[584px]">
-        {/* En-tête */}
+        {/* En-tête du formulaire */}
         <h2 className="text-4xl sm:text-5xl font-bold gap-5 mb-2 sm:mb-5">
           Content de vous revoir !
         </h2>
@@ -73,6 +125,7 @@ const LoginPage = () => {
           Connectez-vous à votre compte Locasmart
         </p>
 
+        {/* Affichage des erreurs globales */}
         {globalError && (
           <div
             className="bg-red-50 border-l-4 border-red-500 p-4 mb-6"
@@ -82,8 +135,9 @@ const LoginPage = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit(handleLogin)} className="space-y-6">
-          {/* Champ email utilisant le composant Input */}
+        {/* Formulaire de connexion */}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {/* Champ email avec validation */}
           <Input
             {...register('email')}
             type="email"
@@ -93,7 +147,7 @@ const LoginPage = () => {
             disabled={isLoading}
           />
 
-          {/* Champ mot de passe utilisant le composant Input */}
+          {/* Champ mot de passe avec validation */}
           <Input
             {...register('password')}
             type="password"
@@ -103,20 +157,21 @@ const LoginPage = () => {
             disabled={isLoading}
           />
 
-          {/* Lien "Mot de passe oublié" */}
+          {/* Lien vers la réinitialisation du mot de passe */}
           <Link href="../password_reset" className="block text-right">
             <p className="text-base text-gray-500 font-normal">
               Mot de passe oublié ?
             </p>
           </Link>
 
-          {/* Bouton de soumission avec style dégradé */}
+          {/* Bouton de soumission avec état de chargement */}
           <button
             type="submit"
             disabled={!isValid || isLoading}
             className="w-full py-3 px-4 mt-8 bg-gradient-to-r from-[#165baa] to-[#707fff] text-white rounded-full font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center space-x-2"
           >
             {isLoading ? (
+              // Affichage du spinner pendant le chargement
               <>
                 <svg
                   className="animate-spin h-5 w-5 text-white"
@@ -147,7 +202,7 @@ const LoginPage = () => {
         </form>
       </div>
 
-      {/* Section droite : image (masquée sur mobile) */}
+      {/* Section droite : Image décorative (masquée sur mobile) */}
       <div className="hidden lg:flex justify-center p-6 ml-16">
         <Image
           src="/images/connexion_page.png"
@@ -159,6 +214,4 @@ const LoginPage = () => {
       </div>
     </div>
   );
-};
-
-export default LoginPage;
+}

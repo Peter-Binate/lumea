@@ -45,75 +45,80 @@ const FirstStep: React.FC<FirstStepProps> = ({
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmitStep)}
-      className="border-2 border-red-500 space-y-4"
-    >
-      {/* Champ Nom */}
-      <div>
-        <input
-          {...register('name')}
-          placeholder="Nom"
-          className={errors.name ? 'border-red-500' : ''}
-        />
-        {/* Affichage du message d'erreur si présent */}
-        {errors.name && (
-          <span className="text-red-500 text-sm mt-1">
-            {errors.name.message}
-          </span>
-        )}
-      </div>
+    <>
+      <p className="text-center text-black text-xl font-normal font-inter leading-[30px] mb-8">
+        Pour commencer nous aurions besoin de votre email
+      </p>
+      <form
+        onSubmit={handleSubmit(onSubmitStep)}
+        className="border-2 border-red-500 space-y-4"
+      >
+        {/* Champ Nom */}
+        <div>
+          <input
+            {...register('name')}
+            placeholder="Nom"
+            className={errors.name ? 'border-red-500' : ''}
+          />
+          {/* Affichage du message d'erreur si présent */}
+          {errors.name && (
+            <span className="text-red-500 text-sm mt-1">
+              {errors.name.message}
+            </span>
+          )}
+        </div>
 
-      {/* Champ Email */}
-      <div>
-        <input
-          {...register('email')}
-          type="email"
-          placeholder="Email"
-          className={errors.email ? 'border-red-500' : ''}
-        />
-        {errors.email && (
-          <span className="text-red-500 text-sm mt-1">
-            {errors.email.message}
-          </span>
-        )}
-      </div>
+        {/* Champ Email */}
+        <div>
+          <input
+            {...register('email')}
+            type="email"
+            placeholder="Email"
+            className={errors.email ? 'border-red-500' : ''}
+          />
+          {errors.email && (
+            <span className="text-red-500 text-sm mt-1">
+              {errors.email.message}
+            </span>
+          )}
+        </div>
 
-      {/* Champ Mot de passe */}
-      <div>
-        <input
-          {...register('password')}
-          type="password"
-          placeholder="Mot de passe"
-          className={errors.password ? 'border-red-500' : ''}
-        />
-        {errors.password && (
-          <span className="text-red-500 text-sm mt-1">
-            {errors.password.message}
-          </span>
-        )}
-      </div>
+        {/* Champ Mot de passe */}
+        <div>
+          <input
+            {...register('password')}
+            type="password"
+            placeholder="Mot de passe"
+            className={errors.password ? 'border-red-500' : ''}
+          />
+          {errors.password && (
+            <span className="text-red-500 text-sm mt-1">
+              {errors.password.message}
+            </span>
+          )}
+        </div>
 
-      {/* Champ Confirmation mot de passe */}
-      <div>
-        <input
-          {...register('confirmPassword')}
-          type="password"
-          placeholder="Confirmer le mot de passe"
-          className={errors.confirmPassword ? 'border-red-500' : ''}
-        />
-        {errors.confirmPassword && (
-          <span className="text-red-500 text-sm mt-1">
-            {errors.confirmPassword.message}
-          </span>
-        )}
-      </div>
+        {/* Champ Confirmation mot de passe */}
+        <div>
+          <input
+            {...register('confirmPassword')}
+            type="password"
+            placeholder="Confirmer le mot de passe"
+            className={errors.confirmPassword ? 'border-red-500' : ''}
+          />
+          {errors.confirmPassword && (
+            <span className="text-red-500 text-sm mt-1">
+              {errors.confirmPassword.message}
+            </span>
+          )}
+        </div>
 
-      {/* Bouton de soumission */}
-      <button type="submit" className="w-full" disabled={!isValid}>
-        Suivant
-      </button>
-    </form>
+        {/* Bouton de soumission */}
+        <button type="submit" className="w-full" disabled={!isValid}>
+          Suivant
+        </button>
+      </form>
+    </>
   );
 };
 
