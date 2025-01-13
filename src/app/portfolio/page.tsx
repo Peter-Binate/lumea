@@ -1,7 +1,7 @@
 export default function Portfolio() {
   return (
     <section>
-      <h1 className="text-slate-900 text-[28px] font-semibold">
+      <h1 className="text-slate-900 text-[28px] font-semibold mt-20 sm:mt-0">
         🏠 Portefeuilles
       </h1>
       <p>
