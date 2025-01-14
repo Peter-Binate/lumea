@@ -4,8 +4,7 @@
 // Imports des dépendances nécessaires
 import Input from '@/app/components/ui/Input';
 import { useAuth } from '@/app/contexts/AuthContext';
-import { LoginFormData } from '@/types/auth';
-import { loginSchema } from '@/utils/validation/auth/login.schema';
+import { loginSchema, type LoginFormData } from '@/utils/validation/schemas';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Image from 'next/image';
 import Link from 'next/link';

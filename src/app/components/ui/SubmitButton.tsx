@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/styling/class-names';
 import { ButtonHTMLAttributes } from 'react';
 
 interface SubmitButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {

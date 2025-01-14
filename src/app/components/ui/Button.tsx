@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/styling/class-names';
 import * as React from 'react';
 
 export interface ButtonProps

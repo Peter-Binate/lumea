@@ -2,7 +2,7 @@
 
 import { NavItems } from '@/app/components/layouts/sidebar/config';
 import { useAuth } from '@/app/contexts/AuthContext';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/styling/class-names';
 import { ChevronLeft, ChevronRight, LogOut, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
