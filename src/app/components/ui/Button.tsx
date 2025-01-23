@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils/styling/class-names';
+import { cn } from '@/lib/utils/styling/class-names'; // Fonction utilitaire pour combiner des classes
 import * as React from 'react';
 
 export interface ButtonProps
@@ -12,20 +12,27 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <button
         className={cn(
-          'btn',
+          'btn', // Classe de base pour le style de bouton
           {
-            'btn-primary': variant === 'primary',
-            'btn-secondary': variant === 'secondary',
-            'btn-accent': variant === 'accent',
-            'btn-ghost': variant === 'ghost',
-            'btn-link': variant === 'link',
-            'btn-outline': variant === 'outline',
+            // Styles dynamiques selon les variantes
+            'bg-[#5a6eb6] text-white hover:bg-indigo-700':
+              variant === 'primary',
+            'bg-gray-200 text-gray-700 hover:bg-gray-300':
+              variant === 'secondary',
+            'bg-yellow-500 text-black hover:bg-yellow-600':
+              variant === 'accent',
+            'bg-transparent text-gray-600 hover:bg-gray-100':
+              variant === 'ghost',
+            'text-indigo-600 underline hover:text-indigo-700':
+              variant === 'link',
+            'border border-indigo-600 text-indigo-600 hover:bg-indigo-100':
+              variant === 'outline',
             'btn-lg': size === 'lg',
             'btn-md': size === 'md',
             'btn-sm': size === 'sm',
             'btn-xs': size === 'xs',
           },
-          className
+          className // Permet d'ajouter des classes personnalisées
         )}
         ref={ref}
         {...props}

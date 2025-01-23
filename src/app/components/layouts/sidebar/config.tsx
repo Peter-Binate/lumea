@@ -24,10 +24,10 @@ export const NavItems = () => {
       position: 'top',
     },
     {
-      name: 'Portefeuilles',
-      href: '/portfolio',
+      name: 'Vos tours',
+      href: '/tour',
       icon: <House size={20} />,
-      active: pathname === '/portfolio',
+      active: pathname === '/tour',
       position: 'top',
     },
     {

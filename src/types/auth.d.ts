@@ -4,35 +4,36 @@ export interface LoginFormData {
   password: string;
 }
 
-// Représentation des données pour une requête d'inscription
-export interface RegisterFormData {
-  name: string;
+// Données d'entrée nécessaires pour effectuer une connexion
+export interface LoginCredentials {
   email: string;
-  password: string;
-  confirmPassword: string;
-  rentalsNumber: number;
-  //subscriptionType: '';
 }
 
-// Réponse d'authentification (API)
+// Réponse de l'api lors de la connexion
 export interface AuthResponse {
-  token: string;
-  user: User; // Objet utilisateur (défini dans user.d.ts)
-}
-
-// Définition des types pour la récupération du mot de passe
-export interface ForgotPasswordFormData {
   email: string;
 }
 
-export interface ResetPasswordFormData {
-  token: string;
-  newPassword: string;
+export interface AuthError {
+  error: string;
 }
 
-// État d'authentification dans le contexte global
-export interface AuthState {
-  isAuthenticated: boolean; // Indique si l'utilisateur est connecté
-  token?: string; // Jeton JWT si connecté
-  user?: User; // Détails de l'utilisateur connecté
-}
+// Représentation des données pour une requête d'inscription
+// export interface RegisterFormData {
+//   name: string;
+//   email: string;
+//   password: string;
+//   confirmPassword: string;
+//   rentalsNumber: number;
+//   //subscriptionType: '';
+// }
+
+// // Définition des types pour la récupération du mot de passe
+// export interface ForgotPasswordFormData {
+//   email: string;
+// }
+
+// export interface ResetPasswordFormData {
+//   token: string;
+//   newPassword: string;
+// }

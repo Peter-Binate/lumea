@@ -61,21 +61,21 @@ export default function LoginPage() {
 
       //On vérifie que le formualire est valide
       if (!isValid) {
-        setGlobalError('Email ou mot de passe invalide');
+        setGlobalError('Email invalide');
         return;
       }
 
       console.log('Données de connexion:', data);
 
       // Tentative de connexion
-      await login(data.email, data.password);
+      await login(data.email);
     } catch (error) {
-      // Gestion des erreurs
-      console.error('Erreur de connexion:', error);
-      setGlobalError('Email ou mot de passe incorrect');
-      //reset({password: ''}); // Réinitialise uniquement le mot de passe
+      if (error instanceof Error && error.message === 'Already logged') {
+        setGlobalError('Un utilisateur est déjà connecté');
+      } else {
+        setGlobalError('Email ou mot de passe incorrect');
+      }
     } finally {
-      // Désactive l'état de chargement dans tous les cas
       setIsLoading(false);
     }
   };
