@@ -7,7 +7,6 @@ import { useAuth } from '@/app/contexts/AuthContext';
 import { loginSchema, type LoginFormData } from '@/utils/validation/schemas';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -147,7 +146,7 @@ export default function LoginPage() {
           />
 
           {/* Champ mot de passe avec validation */}
-          <Input
+          {/*<Input
             {...register('password')}
             type="password"
             label="Mot de passe"
@@ -157,11 +156,11 @@ export default function LoginPage() {
           />
 
           {/* Lien vers la réinitialisation du mot de passe */}
-          <Link href="../password_reset" className="block text-right">
+          {/* <Link href="../password_reset" className="block text-right">
             <p className="text-base text-gray-500 font-normal">
               Mot de passe oublié ?
             </p>
-          </Link>
+          </Link> */}
 
           {/* Bouton de soumission avec état de chargement */}
           <button
