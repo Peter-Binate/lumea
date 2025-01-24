@@ -33,11 +33,15 @@ class AuthService {
       sessionStorage.setItem('userEmail', credentials.email);
       return response;
     } catch (error) {
-      console.error('Erreur détaillée:', error);
-      if (error instanceof Error) {
-        throw new Error(`Erreur de connexion: ${error.message}`);
-      }
-      throw new Error('Échec de la connexion');
+      console.error('Erreur finale détaillée:', {
+        name: error instanceof Error ? error.name : 'Unknown',
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        type: typeof error,
+      });
+      throw new Error(
+        `Erreur de connexion: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 

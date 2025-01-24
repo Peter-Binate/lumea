@@ -10,6 +10,7 @@ interface AuthContextType {
   login: (email: string) => Promise<{ success: boolean }>;
   logout: () => Promise<{ success: boolean }>;
   user: AuthResponse | null;
+  error: string | null;
 }
 
 // Création d'un contexte avec la valeur initiale null
@@ -19,6 +20,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<AuthResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Vérification de la session au chargement de la page
   useEffect(() => {
@@ -31,6 +33,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const userData = authService.getCurrentUser();
           setUser(userData);
         }
+      } catch (error) {
+        setError('Erreur lors de la vérification du statut');
+        setIsAuthenticated(false);
+        setUser(null);
       } finally {
         setIsLoading(false);
       }
@@ -41,6 +47,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Gestion de la connexion de l'utilisateur
   const login = async (email: string) => {
     try {
+      setError(null);
       // Ajout de logs pour le débogage
       console.log('Tentative de connexion avec:', email);
       // On appelle le service d'authentification pour se connecter
@@ -55,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       // Amélioration de la gestion des erreurs
       console.error('Erreur de connexion détaillée:', {
-        message: error instanceof Error ? error.message : 'Erreur inconnue',
+        message: error instanceof Error ? error.message : 'Erreur de connexion',
         error,
       });
 
@@ -69,6 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Gestion de la déconnexion de l'utilisateur
   const logout = async () => {
     try {
+      setError(null);
       // On appelle le service pour déconnecter l'utilisateur
       await authService.logout();
       // On réinitialise les états après déconnexion
@@ -84,7 +92,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, isLoading, login, logout, user }}
+      value={{ isAuthenticated, isLoading, login, logout, user, error }}
     >
       {children}
     </AuthContext.Provider>
