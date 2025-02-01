@@ -3,7 +3,13 @@
 import { NavItems } from '@/app/components/layouts/sidebar/config';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { cn } from '@/lib/utils/styling/class-names';
-import { ChevronLeft, ChevronRight, LogOut, X } from 'lucide-react';
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  LogOut,
+  X,
+} from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -14,14 +20,23 @@ import HeaderLayout from '../header/HeaderLayout';
 export interface ISidebarLayout {}
 
 const SidebarLayout: React.FC<ISidebarLayout> = () => {
+  // Récupération du contexte d'authentification
   const { isAuthenticated, isLoading } = useAuth();
+
+  // Récupération du chemin courant
   const pathname = usePathname();
+
+  // States pour la gestion du sidebar et du menu mobile
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Récupération des éléments de navigation
   const navItems = NavItems();
 
+  // Effet pour gérer le responsive sur resize
   useEffect(() => {
     const handleResize = () => {
+      // Fermer le menu mobile si l'écran est plus grand que 640px
       if (window.innerWidth >= 640) {
         setIsMobileMenuOpen(false);
       }
@@ -31,10 +46,12 @@ const SidebarLayout: React.FC<ISidebarLayout> = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Fonction pour toggle le sidebar
   const toggleSidebar = () => {
     setIsSidebarExpanded(!isSidebarExpanded);
   };
 
+  // Fonction pour toggle le menu mobile
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
@@ -45,6 +62,7 @@ const SidebarLayout: React.FC<ISidebarLayout> = () => {
     return null;
   }
 
+  // Rendu du composant SidebarLayout
   return (
     <>
       <HeaderLayout onMenuClick={toggleMobileMenu} />
@@ -57,6 +75,7 @@ const SidebarLayout: React.FC<ISidebarLayout> = () => {
         )}
       >
         <div className="flex flex-col h-full w-full">
+          {/* Header mobile */}
           <div className="flex justify-between items-center p-4 border-b">
             <Image
               src="/images/strata_logo.png"
@@ -75,7 +94,7 @@ const SidebarLayout: React.FC<ISidebarLayout> = () => {
           </div>
 
           <div className="flex-1 overflow-y-auto px-4">
-            {/* Top Navigation Items */}
+            {/* Navigation du haut */}
             <div className="mt-4">
               {navItems.map((item, index) => {
                 if (item.position === 'top') {
@@ -88,6 +107,10 @@ const SidebarLayout: React.FC<ISidebarLayout> = () => {
                         active={item.active}
                         isSidebarExpanded={true}
                         onClick={toggleMobileMenu}
+                        isDropdown={item.isDropdown}
+                        dropdownOpen={item.dropdownOpen}
+                        toggleDropdown={item.toggleDropdown}
+                        subItems={item.subItems}
                       />
                     </Fragment>
                   );
@@ -95,7 +118,7 @@ const SidebarLayout: React.FC<ISidebarLayout> = () => {
               })}
             </div>
 
-            {/* Bottom Navigation Items */}
+            {/* Navigation du bas */}
             <div className="mt-auto">
               {navItems.map((item, index) => {
                 if (item.position === 'bottom') {
@@ -108,6 +131,10 @@ const SidebarLayout: React.FC<ISidebarLayout> = () => {
                         active={item.active}
                         isSidebarExpanded={true}
                         onClick={toggleMobileMenu}
+                        isDropdown={item.isDropdown}
+                        dropdownOpen={item.dropdownOpen}
+                        toggleDropdown={item.toggleDropdown}
+                        subItems={item.subItems}
                       />
                     </Fragment>
                   );
@@ -116,7 +143,7 @@ const SidebarLayout: React.FC<ISidebarLayout> = () => {
             </div>
           </div>
 
-          {/* Profile Section */}
+          {/* Section Profil mobile */}
           <div className="border-t p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -147,6 +174,7 @@ const SidebarLayout: React.FC<ISidebarLayout> = () => {
           )}
         >
           <aside className="flex h-full flex-col w-full break-words px-4 overflow-x-hidden columns-1">
+            {/* Logo */}
             {isSidebarExpanded ? (
               <div className="mt-8 relative pb-2">
                 <Image
@@ -169,7 +197,7 @@ const SidebarLayout: React.FC<ISidebarLayout> = () => {
               </div>
             )}
 
-            {/* Top */}
+            {/* Navigation du haut */}
             <div className="mt-4 relative pb-2">
               <div className="flex flex-col space-y-1">
                 {navItems.map((item, index) => {
@@ -183,6 +211,10 @@ const SidebarLayout: React.FC<ISidebarLayout> = () => {
                             path={item.href}
                             active={item.active}
                             isSidebarExpanded={isSidebarExpanded}
+                            isDropdown={item.isDropdown}
+                            dropdownOpen={item.dropdownOpen}
+                            toggleDropdown={item.toggleDropdown}
+                            subItems={item.subItems}
                           />
                         </div>
                       </Fragment>
@@ -192,7 +224,7 @@ const SidebarLayout: React.FC<ISidebarLayout> = () => {
               </div>
             </div>
 
-            {/* Bottom */}
+            {/* Navigation du bas */}
             <div className="sticky bottom-0 mt-auto whitespace-nowrap transition duration-200 block">
               {navItems.map((item, index) => {
                 if (item.position === 'bottom') {
@@ -205,6 +237,10 @@ const SidebarLayout: React.FC<ISidebarLayout> = () => {
                           path={item.href}
                           active={item.active}
                           isSidebarExpanded={isSidebarExpanded}
+                          isDropdown={item.isDropdown}
+                          dropdownOpen={item.dropdownOpen}
+                          toggleDropdown={item.toggleDropdown}
+                          subItems={item.subItems}
                         />
                       </div>
                     </Fragment>
@@ -213,8 +249,8 @@ const SidebarLayout: React.FC<ISidebarLayout> = () => {
               })}
             </div>
 
+            {/* Section profil desktop */}
             <div className="divider"></div>
-
             <div
               className={cn(
                 'flex items-center mb-4',
@@ -242,6 +278,7 @@ const SidebarLayout: React.FC<ISidebarLayout> = () => {
             </div>
           </aside>
 
+          {/* Bouton de toggle du sidebar */}
           <div className="mt-[calc(calc(90vh)-40px)] relative">
             <button
               type="button"
@@ -268,15 +305,135 @@ export const SideNavItem: React.FC<{
   active: boolean;
   isSidebarExpanded: boolean;
   onClick?: () => void;
-}> = ({ label, icon, path, active, isSidebarExpanded, onClick }) => {
+  isDropdown?: boolean;
+  dropdownOpen?: boolean;
+  toggleDropdown?: () => void;
+  subItems?: Array<{
+    name: string;
+    href: string;
+    active: boolean;
+  }>;
+}> = ({
+  label,
+  icon,
+  path,
+  active,
+  isSidebarExpanded,
+  onClick,
+  isDropdown,
+  dropdownOpen,
+  toggleDropdown,
+  subItems,
+}) => {
   return (
     <>
       {!onClick ? (
         // Desktop version
         <>
-          {isSidebarExpanded ? (
+          {isDropdown ? (
+            <div className="relative">
+              <div
+                onClick={toggleDropdown}
+                className={`h-full relative flex items-center whitespace-nowrap rounded-md cursor-pointer ${
+                  active
+                    ? 'font-base text-sm bg-neutral-200 text-[#5a6eb6] font-semibold shadow-sm hover:text-[#5a6eb6] dark:bg-[#f3f6fb] dark:hover:text-[#5a6eb6]'
+                    : 'hover:bg-neutral-200 hover:hover:text-[#5a6eb6] font-semibold dark:text-slate-700 dark:hover:bg-[#f3f6fb] dark:hover:text-[#5a6eb6]'
+                }`}
+              >
+                <div className="relative font-base text-sm py-1.5 px-2 flex flex-row items-center space-x-2 rounded-md duration-100">
+                  {icon}
+                  {isSidebarExpanded && (
+                    <>
+                      <span>{label}</span>
+                      <ChevronDown
+                        size={16}
+                        className={`transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}
+                      />
+                    </>
+                  )}
+                </div>
+              </div>
+              {isSidebarExpanded && dropdownOpen && (
+                <div className="pl-4 mt-1 space-y-1">
+                  {subItems?.map((subItem) => (
+                    <Link
+                      key={subItem.href}
+                      href={subItem.href}
+                      className={`block py-1 px-2 text-sm rounded-md ${
+                        subItem.active
+                          ? 'bg-neutral-200 text-[#5a6eb6]'
+                          : 'hover:bg-neutral-200'
+                      }`}
+                    >
+                      {subItem.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            // Existing desktop nav item logic remains the same
             <Link
               href={path}
+              className={`h-full relative flex items-center whitespace-nowrap rounded-md ${
+                active
+                  ? 'font-base text-sm bg-neutral-200 text-[#5a6eb6] font-semibold shadow-sm hover:text-[#5a6eb6] dark:bg-[#f3f6fb] dark:hover:text-[#5a6eb6]'
+                  : 'hover:bg-neutral-200 hover:hover:text-[#5a6eb6] font-semibold dark:text-slate-700 dark:hover:bg-[#f3f6fb] dark:hover:text-[#5a6eb6]'
+              }`}
+            >
+              <div className="relative font-base text-sm py-1.5 px-2 flex flex-row items-center space-x-2 rounded-md duration-100">
+                {icon}
+                {isSidebarExpanded && <span>{label}</span>}
+              </div>
+            </Link>
+          )}
+        </>
+      ) : (
+        // Mobile version (similar updates needed)
+        <div>
+          {isDropdown ? (
+            <div>
+              <div
+                onClick={toggleDropdown}
+                className={`h-full relative flex items-center whitespace-nowrap rounded-md ${
+                  active
+                    ? 'font-base text-sm bg-neutral-200 text-[#5a6eb6] font-semibold shadow-sm hover:text-[#5a6eb6]'
+                    : 'hover:bg-neutral-200 hover:hover:text-[#5a6eb6] font-semibold dark:text-slate-700'
+                }`}
+              >
+                <div className="relative font-base text-sm py-1.5 px-2 flex flex-row items-center space-x-2 rounded-md duration-100">
+                  {icon}
+                  <span>{label}</span>
+                  <ChevronDown
+                    size={16}
+                    className={`transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}
+                  />
+                </div>
+              </div>
+              {dropdownOpen && (
+                <div className="pl-4 mt-1 space-y-1">
+                  {subItems?.map((subItem) => (
+                    <Link
+                      key={subItem.href}
+                      href={subItem.href}
+                      onClick={onClick}
+                      className={`block py-1 px-2 text-sm rounded-md ${
+                        subItem.active
+                          ? 'bg-red-700 text-[#5a6eb6]'
+                          : 'hover:bg-neutral-200 hover:hover:text-[#5a6eb6]'
+                      }`}
+                    >
+                      {subItem.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            // Existing mobile nav item logic remains the same
+            <Link
+              href={path}
+              onClick={onClick}
               className={`h-full relative flex items-center whitespace-nowrap rounded-md ${
                 active
                   ? 'font-base text-sm bg-neutral-200 text-[#5a6eb6] font-semibold shadow-sm hover:text-[#5a6eb6] dark:bg-[#f3f6fb] dark:hover:text-[#5a6eb6]'
@@ -288,37 +445,8 @@ export const SideNavItem: React.FC<{
                 <span>{label}</span>
               </div>
             </Link>
-          ) : (
-            <Link
-              href={path}
-              className={`h-full relative flex items-center whitespace-nowrap rounded-md ${
-                active
-                  ? 'font-base text-sm bg-neutral-200 hover:text-[#5a6eb6] dark:bg-[#f3f6fb] dark:text-[#5a6eb6]'
-                  : 'hover:bg-neutral-200 hover:hover:text-[#5a6eb6] font-semibold dark:text-slate-700 dark:hover:bg-[#f3f6fb] dark:hover:text-white'
-              }`}
-            >
-              <div className="relative font-base text-sm p-2 flex flex-row items-center space-x-2 rounded-md duration-100">
-                {icon}
-              </div>
-            </Link>
           )}
-        </>
-      ) : (
-        // Mobile version
-        <Link
-          href={path}
-          onClick={onClick}
-          className={`h-full relative flex items-center whitespace-nowrap rounded-md ${
-            active
-              ? 'font-base text-sm bg-neutral-200 text-[#5a6eb6] font-semibold shadow-sm hover:text-[#5a6eb6] dark:bg-[#f3f6fb] dark:hover:text-[#5a6eb6]'
-              : 'hover:bg-neutral-200 hover:hover:text-[#5a6eb6] font-semibold dark:text-slate-700 dark:hover:bg-[#f3f6fb] dark:hover:text-[#5a6eb6]'
-          }`}
-        >
-          <div className="relative font-base text-sm py-1.5 px-2 flex flex-row items-center space-x-2 rounded-md duration-100">
-            {icon}
-            <span>{label}</span>
-          </div>
-        </Link>
+        </div>
       )}
     </>
   );

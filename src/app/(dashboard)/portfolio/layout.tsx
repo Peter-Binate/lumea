@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   description: 'Tableau dee bord Lumea',
 };
 
-export default function DashboardLayout({
+export default function PortfolioLayout({
   children,
 }: {
   children: React.ReactNode;

@@ -1,6 +1,6 @@
 import ky from 'ky';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 interface ErrorResponse {
   message?: string;
@@ -17,14 +17,19 @@ export const httpClient = ky.create({
   hooks: {
     beforeRequest: [
       (request) => {
-        // Ajout des headers par défaut
-        request.headers.set('Content-Type', 'application/json');
-        // Log complet de la requête avec l'URL absolue
-        const fullUrl = new URL(request.url, API_BASE_URL);
-        console.log('Requête complète:', {
-          fullUrl: fullUrl.toString(),
-          method: request.method,
+        // Récupérer le token depuis le sessionStorage
+        const userEmail = sessionStorage.getItem('userEmail');
+
+        // Ajouter les headers d'authentification si l'email existe
+        if (userEmail) {
+          request.headers.set('Authorization', `Bearer ${userEmail}`);
+        }
+
+        // Log pour le debug
+        console.log('Headers de la requête:', {
           headers: Object.fromEntries(request.headers.entries()),
+          url: request.url,
+          method: request.method,
         });
       },
     ],
