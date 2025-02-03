@@ -1,4 +1,11 @@
-import { Bell, House, LifeBuoy, MapPin, Settings } from 'lucide-react';
+import {
+  Bell,
+  Clapperboard,
+  House,
+  LifeBuoy,
+  MapPin,
+  Settings,
+} from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
@@ -39,7 +46,7 @@ export const NavItems = () => {
     {
       name: 'Tours',
       href: '/tours',
-      icon: <House size={20} />,
+      icon: <Clapperboard size={20} />,
       active: pathname === '/',
       position: 'top',
     },

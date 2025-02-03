@@ -3,8 +3,8 @@
 import { SideForm } from '@/app/components/forms/SideForm';
 import DashboardTemplate from '@/app/components/templates/dashboard/DashboardTemplate';
 import { Button } from '@/app/components/ui/Button';
-import { useTour } from '@/lib/hooks/useTour';
-import type { Tour } from '@/services/api/tourService';
+import { usePortfolio } from '@/lib/hooks/usePortfolio';
+import type { Portfolio } from '@/services/api/portfolioService';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 
@@ -12,23 +12,23 @@ export default function PropertiesPage() {
   // État local uniquement pour le formulaire
   const [isSideFormOpen, setIsSideFormOpen] = useState(false);
 
-  // Utilisation du hook pour toute la logique des tours
+  // Utilisation du hook pour toute la logique des Portfolios
   const {
-    tours,
+    portfolio,
     isLoading,
     error,
-    createTour,
-    deleteTour: deleteAction,
-  } = useTour('property');
+    createPortfolio,
+    deletePortfolio: deleteAction,
+  } = usePortfolio('property');
 
-  // Wrapper pour supprimer le retour boolean
+  // Wrapper pour supprimer le rePortfolio boolean
   const handleDelete = async (id: string) => {
     await deleteAction(id);
   };
 
   // Gestionnaire pour la création
-  const handleCreateTour = async (data: Partial<Tour>) => {
-    const success = await createTour(data);
+  const handleCreatePortfolio = async (data: Partial<Portfolio>) => {
+    const success = await createPortfolio(data);
     if (success) {
       setIsSideFormOpen(false);
     }
@@ -42,7 +42,7 @@ export default function PropertiesPage() {
       <DashboardTemplate
         isLoading={isLoading}
         error={error}
-        data={tours}
+        data={portfolio}
         pageType="property"
         onDelete={handleDelete}
       >
@@ -66,7 +66,7 @@ export default function PropertiesPage() {
         type="property"
         isOpen={isSideFormOpen}
         onClose={() => setIsSideFormOpen(false)}
-        onSubmit={handleCreateTour}
+        onSubmit={handleCreatePortfolio}
       />
     </>
   );
