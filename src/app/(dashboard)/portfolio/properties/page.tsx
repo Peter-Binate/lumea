@@ -1,7 +1,7 @@
 'use client';
 
 import { SideForm } from '@/app/components/forms/SideForm';
-import DashboardTemplate from '@/app/components/templates/dashboard/DashboardTemplate';
+import PortfolioTemplate from '@/app/components/templates/dashboard/PortfolioDashboardTemplate';
 import { Button } from '@/app/components/ui/Button';
 import { usePortfolio } from '@/lib/hooks/usePortfolio';
 import type { Portfolio } from '@/services/api/portfolioService';
@@ -39,7 +39,7 @@ export default function PropertiesPage() {
       <h1 className="text-slate-900 text-[28px] font-semibold mt-8 mb-8 sm:mt-0">
         🏠 Vos biens
       </h1>
-      <DashboardTemplate
+      <PortfolioTemplate
         isLoading={isLoading}
         error={error}
         data={portfolio}
@@ -60,7 +60,7 @@ export default function PropertiesPage() {
             </Button>
           </div>
         </div>
-      </DashboardTemplate>
+      </PortfolioTemplate>
 
       <SideForm
         type="property"
