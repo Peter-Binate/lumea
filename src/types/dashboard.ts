@@ -56,33 +56,6 @@ export const DASHBOARD_COLUMNS_CONFIG = {
       key: 'status',
       header: 'status',
       render: (value: number) => {
-        const statusConfig = {
-          0: {
-            label: 'En attente',
-            color: 'bg-yellow-500',
-          },
-          1: {
-            label: 'Envoyé',
-            color: 'bg-blue-500',
-          },
-          2: {
-            label: 'En cours',
-            color: 'bg-purple-500',
-          },
-          3: {
-            label: 'En révision',
-            color: 'bg-orange-500',
-          },
-          4: {
-            label: 'Approuvé',
-            color: 'bg-green-500',
-          },
-          5: {
-            label: 'Rejeté',
-            color: 'bg-red-500',
-          },
-        }[value] || { label: 'Inconnu', color: 'bg-gray-500' };
-
         // return (
         //   <span className={`px-2 py-1 rounded-full text-xs bg-${statusConfig.color}-100 text-${statusConfig.color}-800`}>
         //     {statusConfig.label}

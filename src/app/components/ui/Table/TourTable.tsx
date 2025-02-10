@@ -1,75 +1,55 @@
 'use client';
 
 import { Button } from '@/app/components/ui/Button';
-import type { Tour, TourType } from '@/services/api/tourService';
+import type { Tour } from '@/services/api/tourService';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Edit, Eye, Trash2 } from 'lucide-react';
+import { ReactNode } from 'react';
 
 interface TourTableProps {
   data: Tour[];
-  type: TourType;
   onDelete?: (id: string) => Promise<void>;
   onEdit?: (tour: Tour) => void;
   onView?: (tour: Tour) => void;
 }
 
-// Configuration des colonnnes selon le type de tour
-const columnConfigs = {
-  property: [
-    { key: 'title', header: 'Nom' },
-    { key: 'room', header: 'Pièce' },
-    { key: 'description', header: 'Description' },
-    { key: 'created_at', header: 'Date de création' },
-    { key: 'status', header: 'Statut' },
-  ],
-  car: [
-    { key: 'title', header: 'Nom' },
-    { key: 'compartment', header: 'Compartiment' },
-    { key: 'description', header: 'Description' },
-    { key: 'created_at', header: 'Date de création' },
-    { key: 'status', header: 'Statut' },
-  ],
-  monument: [
-    { key: 'title', header: 'Nom' },
-    { key: 'description', header: 'Description' },
-    { key: 'created_at', header: 'Date de création' },
-    { key: 'status', header: 'Statut' },
-  ],
-  object: [
-    { key: 'title', header: 'Nom' },
-    { key: 'description', header: 'Description' },
-    { key: 'created_at', header: 'Date de création' },
-    { key: 'status', header: 'Statut' },
-  ],
+// Définition du type pour une colonnes
+interface Column {
+  key: keyof Tour;
+  header: string;
+}
+
+// Définition des colonnes à afficher
+const columns: Column[] = [
+  { key: 'id', header: 'ID' },
+  { key: 'title', header: 'Tour' },
+  { key: 'status', header: 'Statut' },
+  { key: 'created_at', header: 'Enregistrement' },
+];
+
+// Mapping des statuts pour l'affichage en fonction des valeurs de TOUR_STATUS
+const statusDisplay: Record<number, { text: string; className: string }> = {
+  0: { text: 'En attente', className: 'bg-yellow-100 text-yellow-800' },
+  1: { text: 'Envoyé', className: 'bg-blue-100 text-blue-800' },
+  2: { text: 'En cours', className: 'bg-purple-100 text-purple-800' },
+  3: { text: 'En révision', className: 'bg-orange-100 text-orange-800' },
+  4: { text: 'Approuvé', className: 'bg-green-100 text-green-800' },
+  5: { text: 'Rejeté', className: 'bg-red-100 text-red-800' },
 };
 
-// Mapping des statuts pour l'affichage
-const statusDisplay = {
-  pending: { text: 'En attente', className: 'bg-yellow-100 text-yellow-800' },
-  completed: { text: 'Terminé', className: 'bg-green-100 text-green-800' },
-  cancelled: { text: 'Annulé', className: 'bg-red-100 text-red-800' },
-  default: { text: 'Inconnu', className: 'bg-gray-100 text-gray-800' },
-};
-
-export function TourTable({
-  data,
-  type,
-  onDelete,
-  onEdit,
-  onView,
-}: TourTableProps) {
-  // // Obtenir la configuration des colonnes pour ce type
-  const columns = columnConfigs[type];
-
+export function TourTable({ data, onDelete, onEdit, onView }: TourTableProps) {
   // Formater la valeur selon le type de colonne
-  const formatCellValue = (tour: Tour, key: keyof Tour) => {
+  const formatCellValue = (tour: Tour, key: keyof Tour): ReactNode => {
     if (key === 'created_at' && tour[key]) {
       return format(new Date(tour[key]), 'dd MMMM yyyy', { locale: fr });
     }
     if (key === 'status') {
-      const status = tour[key] as keyof typeof statusDisplay;
-      const statusConfig = statusDisplay[status] || statusDisplay.default;
+      const statusConfig = statusDisplay[tour[key] as number] || {
+        text: 'Inconnu',
+        className: 'bg-gray-100 text-gray-800',
+      };
+
       return (
         <span
           className={`px-2 py-1 rounded-full text-xs ${statusConfig.className}`}
@@ -78,7 +58,7 @@ export function TourTable({
         </span>
       );
     }
-    return tour[key] || '-';
+    return tour[key]?.toString() || '-';
   };
 
   return (

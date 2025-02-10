@@ -1,9 +1,9 @@
 import { useAuth } from '@/app/contexts/AuthContext';
 import { useToast } from '@/lib/hooks/useToast';
-import { Tour, tourService, TourType } from '@/services/api/tourService';
+import { Tour, tourService } from '@/services/api/tourService';
 import { useEffect, useState } from 'react';
 
-export function useTour(type: TourType) {
+export function useTour() {
   const [tours, setTours] = useState<Tour[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -19,7 +19,7 @@ export function useTour(type: TourType) {
         throw new Error('Utilisateur non authentifié');
       }
 
-      const data = await tourService.getTours(type);
+      const data = await tourService.getTours();
       setTours(data);
     } catch (error) {
       console.error('Erreur lors du chargement des tours:', error);
@@ -31,7 +31,7 @@ export function useTour(type: TourType) {
 
   const createTour = async (data: Partial<Tour>) => {
     try {
-      await tourService.createTour(type, data);
+      await tourService.createTour(data);
       toast({
         title: 'Succès',
         description: 'Tour créé avec succès',
@@ -51,7 +51,7 @@ export function useTour(type: TourType) {
 
   const updateTour = async (id: string, data: Partial<Tour>) => {
     try {
-      await tourService.updateTour(type, id, data);
+      await tourService.updateTour(id, data);
       toast({
         title: 'Succès',
         description: 'Tour mis à jour avec succès',
@@ -71,12 +71,12 @@ export function useTour(type: TourType) {
 
   const deleteTour = async (id: string) => {
     try {
-      console.log(`Tentative de suppression - Type: ${type}, ID: ${id}`);
+      console.log(`Tentative de suppression -  ID: ${id}`);
 
-      const result = await tourService.deleteTour(type, id);
+      const result = await tourService.deleteTour(id);
       console.log('Résultat de la suppression:', result);
 
-      if (result.success) {
+      if (result) {
         setTours((prevTours) =>
           prevTours.filter((tour) => tour.id.toString() !== id)
         );
@@ -109,7 +109,7 @@ export function useTour(type: TourType) {
     if (isAuthenticated) {
       loadTours();
     }
-  }, [type, isAuthenticated]);
+  }, [isAuthenticated]);
 
   return { tours, isLoading, error, createTour, updateTour, deleteTour };
 }

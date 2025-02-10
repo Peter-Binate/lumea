@@ -43,9 +43,10 @@ export default function PropertiesPage() {
         isLoading={isLoading}
         error={error}
         data={portfolio}
-        pageType="property"
+        portfolioType="property"
         onDelete={handleDelete}
       >
+        {/* En-tête avec bouton d'ajout */}
         <div className="flex flex-col md:flex-row md:justify-between py-5 px-6">
           <div className="flex flex-col">
             <h2 className="text-lg font-medium">Vos visites</h2>
@@ -62,6 +63,7 @@ export default function PropertiesPage() {
         </div>
       </PortfolioTemplate>
 
+      {/* Formulaire côté */}
       <SideForm
         type="property"
         isOpen={isSideFormOpen}
