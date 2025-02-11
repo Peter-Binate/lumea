@@ -6,13 +6,18 @@ import { ToursDashboardProps } from '@/types/dashboard';
 import BaseDashboardTemplate from './BaseDashboardTemplate';
 
 export default function TourDashboardTemplate(props: ToursDashboardProps) {
-  const { data, onDelete } = props;
+  const { data, onView, onEdit, onDelete } = props;
 
   const content =
     data.length === 0 ? (
       <EmptyState type="tours" />
     ) : (
-      <TourTable data={data} onDelete={onDelete} />
+      <TourTable
+        data={data}
+        onView={onView} // Assurez-vous de passer ces props
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
     );
 
   return <BaseDashboardTemplate {...props} content={content} />;

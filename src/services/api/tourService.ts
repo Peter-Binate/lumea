@@ -12,11 +12,14 @@ export const TOUR_STATUS = {
 } as const;
 
 // Type pour les status de visite
-export type TourStatus = (typeof TOUR_STATUS)[keyof typeof TOUR_STATUS];
+export type TourStatus = Exclude<
+  (typeof TOUR_STATUS)[keyof typeof TOUR_STATUS],
+  'pending'
+>;
 
 // Interface pour la structure d'une visite
 export interface Tour {
-  id: number;
+  id: string;
   title: string;
   description: string;
   status: TourStatus;
