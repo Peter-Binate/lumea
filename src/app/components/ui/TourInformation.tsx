@@ -7,7 +7,7 @@ import { ExternalLink, Share2, Trash2 } from 'lucide-react';
 interface TourInformationProps {
   isOpen: boolean;
   onClose: () => void;
-  tour: Tour;
+  tour?: Tour;
   onDelete?: (id: string) => Promise<void>;
 }
 

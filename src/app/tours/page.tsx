@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react';
 import TourDashboardTemplate from '../components/templates/dashboard/TourDashboardTemplate';
 
 export default function ToursPage() {
-  const [selectedTour, setSelectedTour] = useState<Tour>();
+  const [selectedTour, setSelectedTour] = useState<Tour | undefined>();
   const [isInfoOpen, setIsInfoOpen] = useState(false);
 
   // Utilisation du hook tour
