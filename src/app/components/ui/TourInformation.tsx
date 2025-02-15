@@ -29,8 +29,7 @@ export const TourInformation = ({
   onDelete,
 }: TourInformationProps) => {
   console.log('TourInformation rendu, isOpen =', isOpen, 'tour =', tour);
-  // if (!tour) return null;
-  if (!isOpen) return null;
+  if (!tour || !isOpen) return null;
 
   const statusDisplay = statusConfig[tour.status] || {
     text: 'Inconnu',
