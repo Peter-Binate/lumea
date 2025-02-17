@@ -2,7 +2,6 @@
 
 import { Button } from '@/app/components/ui/Button';
 import Input from '@/app/components/ui/Input';
-import { TourType } from '@/services/api/tourService';
 import { X } from 'lucide-react';
 import { useState } from 'react';
 
@@ -10,72 +9,34 @@ interface SidebarFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: FormData) => Promise<void>;
-  type: TourType;
 }
 
 interface FormData {
   title: string;
-  room?: string;
   compartment?: string;
   description: string;
 }
 
 const formConfig = {
-  property: {
-    title: 'Nouvelle propriété',
-    fields: ['title', 'room', 'description'],
-    labels: {
-      title: 'Nom de la propriété',
-      room: 'Pièce',
-      description: 'Description',
-    },
-  },
-  car: {
-    title: 'Nouveau véhicule',
-    fields: ['title', 'compartment', 'description'],
-    labels: {
-      title: 'Nom du véhicule',
-      compartment: 'Compartiment',
-      description: 'Description',
-    },
-  },
-  monument: {
-    title: 'Nouveau monument',
-    fields: ['title', 'description'],
-    labels: {
-      title: 'Nom du monument',
-      description: 'Description',
-    },
-  },
-  object: {
-    title: 'Nouvel objet',
-    fields: ['title', 'description'],
-    labels: {
-      title: "Nom de l'objet",
-      description: 'Description',
-    },
+  title: 'Nouveau véhicule',
+  fields: ['title', 'compartment', 'description'],
+  labels: {
+    title: 'Nom du véhicule',
+    compartment: 'Compartiment',
+    description: 'Description',
   },
 };
 
-export const SideForm = ({
-  isOpen,
-  onClose,
-  onSubmit,
-  type,
-}: SidebarFormProps) => {
+export const SideForm = ({ isOpen, onClose, onSubmit }: SidebarFormProps) => {
   // Etat initial du formulaire
   const [formData, setFormData] = useState<FormData>({
     title: '',
-    ...(type === 'property' && { room: '' }),
-    ...(type === 'car' && { compartment: '' }),
+    compartment: '',
     description: '',
   });
 
   // État de chargement lors de la soumission
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Configuration spécifique au type de tour
-  const config = formConfig[type];
 
   // Gestion des changements dans les champs formulaire
   const handleChange =
@@ -96,8 +57,7 @@ export const SideForm = ({
       // Réinitialiser le formulaire après la soumission réussie
       setFormData({
         title: '',
-        ...(type === 'property' && { room: '' }),
-        ...(type === 'car' && { compartment: '' }),
+        compartment: '',
         description: '',
       });
     } finally {
@@ -114,7 +74,7 @@ export const SideForm = ({
       <div className="h-full flex flex-col">
         {/* En-tête */}
         <div className="flex justify-between items-center p-6 border-b">
-          <h2 className="text-xl font-semibold">{config.title}</h2>
+          <h2 className="text-xl font-semibold">{formConfig.title}</h2>
           <Button
             variant="ghost"
             size="icon"
@@ -131,7 +91,7 @@ export const SideForm = ({
             {/* Champ Nom */}
             <div>
               <Input
-                label={config.labels.title}
+                label={formConfig.labels.title}
                 value={formData.title}
                 onChange={handleChange('title')}
                 required
@@ -141,7 +101,7 @@ export const SideForm = ({
             {/* Champ Description */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                {config.labels.description}
+                {formConfig.labels.description}
               </label>
               <textarea
                 value={formData.description}
@@ -152,25 +112,15 @@ export const SideForm = ({
               />
             </div>
 
-            {/* Champ Room/Compartment conditionnel */}
-            {(type === 'property' || type === 'car') && (
-              <div>
-                <Input
-                  label={
-                    type === 'property'
-                      ? config.labels.room
-                      : config.labels.compartment
-                  }
-                  value={
-                    type === 'property' ? formData.room : formData.compartment
-                  }
-                  onChange={handleChange(
-                    type === 'property' ? 'room' : 'compartment'
-                  )}
-                  required
-                />
-              </div>
-            )}
+            {/* Champ Compartment  */}
+            <div>
+              <Input
+                label={formConfig.labels.compartment}
+                value={formData.compartment}
+                onChange={handleChange('compartment')}
+                required
+              />
+            </div>
           </div>
         </form>
 

@@ -1,20 +1,16 @@
 import { useAuth } from '@/app/contexts/AuthContext';
 import { useToast } from '@/lib/hooks/useToast';
-import {
-  Portfolio,
-  portfolioService,
-  PortfolioType,
-} from '@/services/api/portfolioService';
+import { Vehicle, vehicleService } from '@/services/api/vehicleService';
 import { useEffect, useState } from 'react';
 
-export function usePortfolio(type: PortfolioType) {
-  const [portfolio, setPortfolio] = useState<Portfolio[]>([]);
+export function useVehicle() {
+  const [vehicle, setVehicle] = useState<Vehicle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
 
-  const loadPortfolio = async () => {
+  const loadVehicle = async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -23,8 +19,8 @@ export function usePortfolio(type: PortfolioType) {
         throw new Error('Utilisateur non authentifié');
       }
 
-      const data = await portfolioService.getPortfolio(type);
-      setPortfolio(data);
+      const data = await vehicleService.getAllVehicles();
+      setVehicle(data);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : 'Une erreur est survenue';
@@ -39,15 +35,15 @@ export function usePortfolio(type: PortfolioType) {
     }
   };
 
-  const createPortfolio = async (data: Partial<Portfolio>) => {
+  const createVehicle = async (data: Partial<Vehicle>) => {
     try {
-      await portfolioService.createPortfolio(type, data);
+      await vehicleService.createVehicle(data);
       toast({
         title: 'Succès',
         description: 'Propriété créée avec succès',
         type: 'success',
       });
-      await loadPortfolio();
+      await loadVehicle();
       return true;
     } catch (error) {
       toast({
@@ -59,15 +55,15 @@ export function usePortfolio(type: PortfolioType) {
     }
   };
 
-  const updatePortfolio = async (id: string, data: Partial<Portfolio>) => {
+  const updateVehicle = async (id: string, data: Partial<Vehicle>) => {
     try {
-      await portfolioService.updatePortfolio(type, id, data);
+      await vehicleService.updateVehicle(id, data);
       toast({
         title: 'Succès',
         description: 'Propriété mise à jour avec succès',
         type: 'success',
       });
-      await loadPortfolio();
+      await loadVehicle();
       return true;
     } catch (err) {
       toast({
@@ -79,15 +75,15 @@ export function usePortfolio(type: PortfolioType) {
     }
   };
 
-  const deletePortfolio = async (id: string) => {
+  const deleteVehicle = async (id: string) => {
     try {
-      await portfolioService.deletePortfolio(type, id);
+      await vehicleService.deleteVehicle(id);
       toast({
         title: 'Succès',
         description: 'Propriété supprimée avec succès',
         type: 'success',
       });
-      await loadPortfolio();
+      await loadVehicle();
       return true;
     } catch (err) {
       toast({
@@ -102,17 +98,17 @@ export function usePortfolio(type: PortfolioType) {
   // Chargement initial des données
   useEffect(() => {
     if (isAuthenticated) {
-      loadPortfolio();
+      loadVehicle();
     }
-  }, [type, isAuthenticated]);
+  }, [isAuthenticated]);
 
   return {
-    portfolio,
+    vehicle,
     isLoading,
     error,
-    loadPortfolio,
-    createPortfolio,
-    updatePortfolio,
-    deletePortfolio,
+    loadVehicle,
+    createVehicle,
+    updateVehicle,
+    deleteVehicle,
   };
 }

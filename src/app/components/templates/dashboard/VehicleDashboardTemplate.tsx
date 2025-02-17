@@ -1,26 +1,23 @@
 'use client';
 
 import { EmptyState } from '@/app/components/ui/EmptyState';
-import { PortfolioTable } from '@/app/components/ui/Table/PortfolioTable';
+import { VehicleTable } from '@/app/components/ui/Table/VehicleTable';
 import {
   DASHBOARD_HEADERS_CONFIG,
-  PortfolioDashboardProps,
+  VehicleDashboardProps,
 } from '@/types/dashboard';
 import BaseDashboardTemplate from './BaseDashboardTemplate';
 
-export default function PortfolioDashboardTemplate(
-  props: PortfolioDashboardProps
-) {
-  const { data, portfolioType, onDelete, onEdit, onView } = props;
-  const header = DASHBOARD_HEADERS_CONFIG[portfolioType];
+export default function VehicleDashboardTemplate(props: VehicleDashboardProps) {
+  const { data, onDelete, onEdit, onView, children } = props;
+  const header = DASHBOARD_HEADERS_CONFIG.vehicle;
 
   const content =
     data.length === 0 ? (
-      <EmptyState type={portfolioType} />
+      <EmptyState />
     ) : (
-      <PortfolioTable
+      <VehicleTable
         data={data}
-        type={portfolioType}
         onDelete={onDelete}
         onEdit={onEdit}
         onView={onView}
@@ -34,6 +31,7 @@ export default function PortfolioDashboardTemplate(
           <h2 className="text-lg font-medium">{header.title}</h2>
           <p className="text-gray-600 text-sm">{header.description}</p>
         </div>
+        {children}
       </div>
     </BaseDashboardTemplate>
   );

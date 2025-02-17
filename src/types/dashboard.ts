@@ -1,5 +1,5 @@
-import { Portfolio, PortfolioType } from '@/services/api/portfolioService';
 import { Tour } from '@/services/api/tourService';
+import { Vehicle } from '@/services/api/vehicleService';
 
 // Props de base communes à tous les templates de dashboard
 export interface BaseDashboardProps {
@@ -9,13 +9,12 @@ export interface BaseDashboardProps {
   error: Error | string | null;
 }
 
-// Props spécifiques au template Portfolio
-export interface PortfolioDashboardProps extends BaseDashboardProps {
-  data: Portfolio[];
-  portfolioType: PortfolioType;
+// Props spécifiques au template Vehicle
+export interface VehicleDashboardProps extends BaseDashboardProps {
+  data: Vehicle[];
   onDelete: (id: string) => Promise<void>;
-  onEdit?: (portfolio: Portfolio) => void;
-  onView?: (portfolio: Portfolio) => void;
+  onEdit?: (Vehicle: Vehicle) => void;
+  onView?: (Vehicle: Vehicle) => void;
 }
 
 // Props spécifiques au template Tours
@@ -46,16 +45,14 @@ const baseColumns: TableColumn[] = [
 
 // Configuration des colonnes spécifiques par type
 export const DASHBOARD_COLUMNS_CONFIG = {
-  property: [...baseColumns, { key: 'rooms', header: 'Pièce' }],
-  car: [...baseColumns],
-  monument: [...baseColumns],
-  object: [...baseColumns],
+  // TODO: Changer key "rooms" en "compartment"
+  vehicle: [...baseColumns, { key: 'rooms', header: 'Compartiment' }],
   tours: [
     ...baseColumns,
     {
       key: 'status',
       header: 'status',
-      render: (value: number) => {
+      render: () => {
         // return (
         //   <span className={`px-2 py-1 rounded-full text-xs bg-${statusConfig.color}-100 text-${statusConfig.color}-800`}>
         //     {statusConfig.label}
@@ -68,25 +65,10 @@ export const DASHBOARD_COLUMNS_CONFIG = {
 
 // Configuration des en-têtes de colonnes
 export const DASHBOARD_HEADERS_CONFIG = {
-  property: {
-    title: 'Vos propriétés',
-    description: 'Gérez vos biens immobiliers',
-    buttonLabel: 'Nouvelle propriété',
-  },
-  car: {
+  vehicle: {
     title: 'Vos véhicules',
     description: 'Gérez vos véhicules',
     buttonLabel: 'Nouveau véhicule',
-  },
-  monument: {
-    title: 'Vos monuments',
-    description: 'Gérez vos monuments',
-    buttonLabel: 'Nouveau monument',
-  },
-  object: {
-    title: 'Vos objets',
-    description: 'Gérez vos objets',
-    buttonLabel: 'Nouvel objet',
   },
   tours: {
     title: 'Vos visites',

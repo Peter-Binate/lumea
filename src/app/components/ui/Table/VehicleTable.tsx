@@ -1,18 +1,17 @@
 'use client';
 
 import { Button } from '@/app/components/ui/Button';
-import { Portfolio, PortfolioType } from '@/services/api/portfolioService';
+import { Vehicle } from '@/services/api/vehicleService';
 import { DASHBOARD_COLUMNS_CONFIG } from '@/types/dashboard';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Edit, Eye, Trash2 } from 'lucide-react';
 
-interface PortfolioTableProps {
-  data: Portfolio[];
-  type: PortfolioType;
+interface VehicleTableProps {
+  data: Vehicle[];
   onDelete?: (id: string) => Promise<void>;
-  onEdit?: (portfolio: Portfolio) => void;
-  onView?: (portfolio: Portfolio) => void;
+  onEdit?: (Vehicle: Vehicle) => void;
+  onView?: (Vehicle: Vehicle) => void;
 }
 
 const formatCellValue = (value: any) => {
@@ -22,14 +21,13 @@ const formatCellValue = (value: any) => {
   return value;
 };
 
-export function PortfolioTable({
+export function VehicleTable({
   data,
-  type,
   onDelete,
   onEdit,
   onView,
-}: PortfolioTableProps) {
-  const columns = DASHBOARD_COLUMNS_CONFIG[type];
+}: VehicleTableProps) {
+  const columns = DASHBOARD_COLUMNS_CONFIG.vehicle;
 
   return (
     <div className="overflow-x-auto">
@@ -58,8 +56,8 @@ export function PortfolioTable({
                   className="px-6 py-4 whitespace-nowrap"
                 >
                   {column.render
-                    ? column.render(item[column.key as keyof Portfolio])
-                    : formatCellValue(item[column.key as keyof Portfolio])}
+                    ? column.render(item[column.key as keyof Vehicle])
+                    : formatCellValue(item[column.key as keyof Vehicle])}
                 </td>
               ))}
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">

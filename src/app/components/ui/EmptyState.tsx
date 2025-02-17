@@ -1,30 +1,13 @@
-import { TourType } from '@/services/api/tourService';
-
 const emptyStateMessages = {
-  property: {
-    title: 'Aucun bien de disponible',
-    description:
-      "Pour initier une demande d'immersion, veuilliez créer un bien",
-  },
-  car: {
+  vehicle: {
     title: 'Aucun véhicule de disponible',
     description:
       "Pour initier une demande d'immersion, veuilliez créer un véhicule",
   },
-  monument: {
-    title: 'Aucun monument de disponible',
-    description:
-      "Pour initier une demande d'immersion, veuilliez créer un monument",
-  },
-  object: {
-    title: 'Aucun objet de disponible',
-    description:
-      "Pour initier une demande d'immersion, veuilliez créer un objet",
-  },
 };
 
-export function EmptyState({ type }: { type: TourType }) {
-  const message = emptyStateMessages[type];
+export function EmptyState() {
+  const message = emptyStateMessages.vehicle;
 
   return (
     <div className="flex flex-col items-center justify-center h-full">

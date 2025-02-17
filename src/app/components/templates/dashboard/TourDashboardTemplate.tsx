@@ -10,7 +10,7 @@ export default function TourDashboardTemplate(props: ToursDashboardProps) {
 
   const content =
     data.length === 0 ? (
-      <EmptyState type="tours" />
+      <EmptyState />
     ) : (
       <TourTable
         data={data}
