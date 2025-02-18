@@ -73,6 +73,6 @@ export const DASHBOARD_HEADERS_CONFIG = {
   tours: {
     title: 'Vos visites',
     description: 'Gérez vos visites virtuelles',
-    buttonLabel: 'Nouvelle visite',
+    buttonLabel: 'Demander un tour',
   },
 } as const;

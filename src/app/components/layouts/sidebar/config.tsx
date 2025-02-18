@@ -18,19 +18,9 @@ export const NavItems = () => {
   // Définition des sous-liens du dropdown "Vos tours"
   const toursSubItems = [
     {
-      name: 'Propriétés',
-      href: '/portfolio/properties',
-      active: pathname === '/portfolio/properties',
-    },
-    {
       name: 'Véhicules',
       href: '/portfolio/cars',
       active: pathname === '/portfolio/cars',
-    },
-    {
-      name: 'Monuments',
-      href: '/portfolio/monuments',
-      active: pathname === '/portfolio/monuments',
     },
   ];
 
