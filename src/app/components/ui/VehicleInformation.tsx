@@ -10,7 +10,7 @@ interface VehicleInformationProps {
   isOpen: boolean;
   onClose: () => void;
   vehicle?: Vehicle;
-  onDelete?: (id: string) => Promise<void>;
+  onDelete?: (id: string) => void;
 }
 
 export const VehicleInformation = ({

@@ -12,7 +12,7 @@ export interface BaseDashboardProps {
 // Props spécifiques au template Vehicle
 export interface VehicleDashboardProps extends BaseDashboardProps {
   data: Vehicle[];
-  onDelete: (id: string) => Promise<void>;
+  onDelete: (id: string) => void;
   onEdit?: (Vehicle: Vehicle) => void;
   onView?: (Vehicle: Vehicle) => void;
 }

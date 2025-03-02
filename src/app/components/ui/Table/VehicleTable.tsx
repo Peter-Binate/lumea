@@ -9,7 +9,7 @@ import { Edit, Eye, Trash2 } from 'lucide-react';
 
 interface VehicleTableProps {
   data: Vehicle[];
-  onDelete?: (id: string) => Promise<void>;
+  onDelete?: (id: string) => void;
   onEdit?: (Vehicle: Vehicle) => void;
   onView?: (Vehicle: Vehicle) => void;
 }
