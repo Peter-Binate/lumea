@@ -14,7 +14,7 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
   // Si l'utilisateur est authentifié et n'est pas sur une page d'authentification, on applique le layout avec flex et sidebar
   if (isAuthenticated && !isAuthPath) {
     return (
-      <div className="flex border-2 border-blue-500">
+      <div className="flex border-2 border-gray-200">
         <SidebarLayout />
         <div className="w-full overflow-x-auto">
           <div className="sm:h-[calc(99vh-60px)] overflow-auto">

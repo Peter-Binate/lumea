@@ -13,7 +13,7 @@ export default function Home() {
       if (!isAuthenticated) {
         router.push('/auth/login');
       } else {
-        router.push('/dashboard');
+        router.push('/portfolio/cars');
       }
     }
   }, [isAuthenticated, isLoading, router]);

@@ -112,7 +112,7 @@ export default function LoginPage() {
 
   return (
     // Container principal avec mise en page responsive
-    <div className="border-2 border-red mt-10 max-w-screen-lg sm:max-w-full min-h-screen overflow-hidden flex flex-col lg:flex-row items-center justify-center">
+    <div className="mt-10 max-w-screen-lg sm:max-w-full min-h-screen overflow-hidden flex flex-col lg:mt-0 lg:flex-row items-center justify-center">
       {/* Section gauche : Formulaire de connexion */}
       <div className="flex-1 max-w-[584px]">
         {/* En-tête du formulaire */}

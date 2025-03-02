@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Fragment, useEffect, useState } from 'react';
 import ProfileImage from '../../ui/ProfileImage';
 import HeaderLayout from '../header/HeaderLayout';
@@ -21,7 +21,8 @@ export interface ISidebarLayout {}
 
 const SidebarLayout: React.FC<ISidebarLayout> = () => {
   // Récupération du contexte d'authentification
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, logout } = useAuth();
+  const router = useRouter();
 
   // Récupération du chemin courant
   const pathname = usePathname();
@@ -32,6 +33,16 @@ const SidebarLayout: React.FC<ISidebarLayout> = () => {
 
   // Récupération des éléments de navigation
   const navItems = NavItems();
+
+  // Déconnexion de l'utilisateur
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.push('/auth/login');
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion:', error);
+    }
+  };
 
   // Effet pour gérer le responsive sur resize
   useEffect(() => {
@@ -159,7 +170,10 @@ const SidebarLayout: React.FC<ISidebarLayout> = () => {
                   </p>
                 </div>
               </div>
-              <LogOut className="h-[20px] hover:text-[#5a6eb6] cursor-pointer" />
+              <LogOut
+                className="h-[20px] hover:text-[#5a6eb6] cursor-pointer"
+                onClick={handleLogout}
+              />
             </div>
           </div>
         </div>
@@ -270,10 +284,16 @@ const SidebarLayout: React.FC<ISidebarLayout> = () => {
                       olivia@untitledui.com
                     </p>
                   </div>
-                  <LogOut className="h-[20px] hover:text-[#5a6eb6] cursor-pointer" />
+                  <LogOut
+                    className="h-[20px] hover:text-[#5a6eb6] cursor-pointer"
+                    onClick={handleLogout}
+                  />
                 </>
               ) : (
-                <LogOut className="h-[20px] hover:text-[#5a6eb6] cursor-pointer" />
+                <LogOut
+                  className="h-[20px] hover:text-[#5a6eb6] cursor-pointer"
+                  onClick={handleLogout}
+                />
               )}
             </div>
           </aside>
