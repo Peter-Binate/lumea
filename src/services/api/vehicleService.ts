@@ -7,7 +7,8 @@ export interface Vehicle {
   description: string;
   created_at: Date;
   status: 'pending' | 'completed' | 'cancelled';
-  compartment?: string;
+  room?: [];
+  //compartment?: string;
 }
 
 export const vehicleService = {

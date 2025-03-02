@@ -3,6 +3,7 @@
 import { SideForm } from '@/app/components/forms/SideForm';
 import VehicleDashboardTemplate from '@/app/components/templates/dashboard/VehicleDashboardTemplate';
 import { Button } from '@/app/components/ui/Button';
+import { VehicleInformation } from '@/app/components/ui/VehicleInformation';
 import { useVehicle } from '@/lib/hooks/useVehicle';
 import { Vehicle } from '@/services/api/vehicleService';
 import { DASHBOARD_HEADERS_CONFIG } from '@/types/dashboard';
@@ -12,6 +13,8 @@ import { useState } from 'react';
 export default function VehiclesPage() {
   // État local uniquement pour le formulaire
   const [isSideFormOpen, setIsSideFormOpen] = useState(false);
+  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | undefined>();
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
 
   // Utilisation du hook pour toute la logique des Vehicless
   const {
@@ -22,9 +25,10 @@ export default function VehiclesPage() {
     deleteVehicle: deleteAction,
   } = useVehicle();
 
-  // Wrapper pour supprimer le reVehicles boolean
-  const handleDelete = async (id: string) => {
-    await deleteAction(id);
+  // Wrapper pour afficher le formulaire de compartiment
+  const handleViewVehicle = (vehicle: Vehicle) => {
+    setSelectedVehicle(vehicle);
+    setIsInfoOpen(true);
   };
 
   // Gestionnaire pour la création
@@ -33,6 +37,11 @@ export default function VehiclesPage() {
     if (success) {
       setIsSideFormOpen(false);
     }
+  };
+
+  // Wrapper pour supprimer le Vehicles boolean
+  const handleDelete = async (id: string) => {
+    await deleteAction(id);
   };
 
   return (
@@ -44,6 +53,7 @@ export default function VehiclesPage() {
         isLoading={isLoading}
         error={error}
         data={vehicle}
+        onView={handleViewVehicle}
         onDelete={handleDelete}
       >
         {/* En-tête avec bouton d'ajout */}
@@ -60,6 +70,13 @@ export default function VehiclesPage() {
         isOpen={isSideFormOpen}
         onClose={() => setIsSideFormOpen(false)}
         onSubmit={handleCreateVehicles}
+      />
+
+      <VehicleInformation
+        isOpen={isInfoOpen}
+        onClose={() => setIsInfoOpen(false)}
+        vehicle={selectedVehicle}
+        onDelete={handleDelete}
       />
     </>
   );

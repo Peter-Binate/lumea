@@ -17,7 +17,7 @@ export interface Compartment {
   title: string;
   description: string;
   status?: CompartmentStatus;
-  vehicle_id: string;
+  property: string; // A remplacer par vehicle_id
   created_at: Date;
   updated_at: string;
 }
@@ -27,7 +27,7 @@ export interface CompartmentInput {
   title?: string;
   description?: string;
   status?: CompartmentStatus;
-  vehicle_id?: string;
+  property?: string;
 }
 
 interface ErrorResponse {
@@ -47,7 +47,7 @@ export class CompartmentServiceError extends Error {
 
 export const compartmentService = {
   // Récupération de tous les compartiments
-  async getCompartments(): Promise<Compartment[]> {
+  async getAllCompartments(): Promise<Compartment[]> {
     try {
       const response = await httpClient.get('tour/room');
       //TODO remplacer par => const response = await httpClient.get('compartment/compartment');
@@ -100,7 +100,7 @@ export const compartmentService = {
   // Création d'un compartiment
   async createCompartment(data: CompartmentInput): Promise<Compartment> {
     try {
-      const response = await httpClient.post('tour/room/', {
+      const response = await httpClient.post(`tour/room/`, {
         json: data,
         throwHttpErrors: false,
       });

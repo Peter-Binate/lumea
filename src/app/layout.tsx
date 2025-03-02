@@ -1,8 +1,8 @@
 import { AuthProvider } from '@/app/contexts/AuthContext';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
+import LayoutWrapper from './components/layouts/LayoutWrapper';
 import PrimaryLayout from './components/layouts/primary/PrimaryLayout';
-import SidebarLayout from './components/layouts/sidebar/SidebarLayout';
 import './globals.css';
 
 const geistSans = Geist({
@@ -32,10 +32,7 @@ export default function RootLayout({
       >
         <AuthProvider>
           <PrimaryLayout>
-            <div className="flex">
-              <SidebarLayout />
-              {children}
-            </div>
+            <LayoutWrapper>{children}</LayoutWrapper>
           </PrimaryLayout>
         </AuthProvider>
       </body>
