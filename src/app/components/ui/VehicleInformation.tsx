@@ -25,12 +25,6 @@ export const VehicleInformation = ({
 
   if (!vehicle || !isOpen) return null;
 
-  // Gestionnaire pour la demande de tour
-  const handleRequestTour = () => {
-    // Implémentez ici la logique pour demander un tour
-    //toast.info('Demande de tour envoyée');
-  };
-
   return (
     <div
       className={`fixed right-0 top-0 h-full w-96 bg-white shadow-xl transform transition-transform duration-300 ease-in-out ${
@@ -65,12 +59,6 @@ export const VehicleInformation = ({
             </h4>
             <p className="text-sm text-gray-600">{vehicle.description}</p>
           </div>
-
-          {/* Section Compartiment */}
-          {/* <CompartmentInformation
-            compartments={vehicle.room}
-            onRequestTour={handleRequestTour}
-          /> */}
         </div>
 
         {/* Actions en bas */}

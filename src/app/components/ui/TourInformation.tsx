@@ -3,6 +3,7 @@ import { Tour } from '@/services/api/tourService';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { ExternalLink, Share2, Trash2 } from 'lucide-react';
+import { CompartmentInformation } from './CompartmentInformation';
 
 interface TourInformationProps {
   isOpen: boolean;
@@ -35,6 +36,17 @@ export const TourInformation = ({
     text: 'Inconnu',
     className: 'bg-gray-100 text-gray-800',
   };
+
+  // Gestionnaire pour la demande de tour
+  const handleRequestTour = () => {
+    // Implémentez ici la logique pour demander un tour
+    //toast.info('Demande de tour envoyée');
+  };
+
+  const handleEditCompartment = (id: string) => {
+    console.log(`Editer le compartiment: ${id}`);
+    
+  }
 
   return (
     <div
@@ -100,11 +112,11 @@ export const TourInformation = ({
               <div>
                 <p className="text-sm text-gray-600">Bien relié</p>
                 <p className="text-sm font-medium">
-                  {tour.property?.title || 'Non défini'}
+                  {tour.car?.title || 'Non défini'}
                 </p>
               </div>
             </div>
-            {tour.room && (
+            {tour.compartment && (
               <div className="mt-4 flex items-center">
                 <Button
                   variant="ghost"
@@ -125,6 +137,13 @@ export const TourInformation = ({
             </h4>
             <p className="text-sm text-gray-600">{tour.description}</p>
           </div>
+
+          {/* Section Compartiment */}
+          <CompartmentInformation
+            compartments={tour.compartment}
+            onEditCompartment={handleEditCompartment}
+            onRequestTour={handleRequestTour}
+          />
 
           {/* Date de création */}
           <div>

@@ -1,4 +1,5 @@
 import { httpClient } from '@/services/api/httpClient';
+import { Compartment } from '@/types/tour';
 import { type } from 'os';
 
 export interface Vehicle {
@@ -7,7 +8,7 @@ export interface Vehicle {
   description: string;
   created_at: Date;
   status: 'pending' | 'completed' | 'cancelled';
-  room?: [];
+  room?: Compartment[];
   //compartment?: string;
 }
 

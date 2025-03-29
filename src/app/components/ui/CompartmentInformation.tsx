@@ -1,9 +1,10 @@
 'use client';
 
 import { Button } from '@/app/components/ui/Button';
+//import { Compartment, TOUR_VIEW_CHOICES, TourViewChoiceType } from '@/types/tour';
 import { Edit, PlayCircle, Trash2 } from 'lucide-react';
 
-// Définition de l'énumération des types de compartiments
+// A DELETE DEBUT
 export const TOUR_VIEW_CHOICES = {
   OUTSIDE: 0,
   INSIDE: 1,
@@ -12,16 +13,15 @@ export const TOUR_VIEW_CHOICES = {
   OTHER: 4,
 } as const;
 
-// Type pour les choix de compartiments
-type TourViewChoiceType =
+export type TourViewChoiceType = 
   (typeof TOUR_VIEW_CHOICES)[keyof typeof TOUR_VIEW_CHOICES];
 
-// Interface pour un compartiment
-interface Compartment {
+export interface Compartment {
   id: string;
   type: TourViewChoiceType;
   isActive: boolean;
 }
+// A DELETE FIN
 
 // Mapping pour les noms des compartiments
 const compartmentNames: Record<TourViewChoiceType, string> = {
@@ -33,7 +33,7 @@ const compartmentNames: Record<TourViewChoiceType, string> = {
 };
 
 interface CompartmentInformationProps {
-  compartments: Compartment[];
+  compartments?: Compartment[];
   onEditCompartment: (id: string) => void;
   onDeleteCompartment?: (id: string) => void;
   onRequestTour?: () => void;

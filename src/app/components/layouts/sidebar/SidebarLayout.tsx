@@ -17,9 +17,15 @@ import { Fragment, useEffect, useState } from 'react';
 import ProfileImage from '../../ui/ProfileImage';
 import HeaderLayout from '../header/HeaderLayout';
 
-export interface ISidebarLayout {}
+export interface ISidebarLayout {
+  onToggle?: (expanded: boolean) => void;
+  initialExpanded?: boolean;
+}
 
-const SidebarLayout: React.FC<ISidebarLayout> = () => {
+const SidebarLayout: React.FC<ISidebarLayout> = ({
+  onToggle,
+  initialExpanded = true,
+}) => {
   // Récupération du contexte d'authentification
   const { isAuthenticated, isLoading, logout } = useAuth();
   const router = useRouter();
@@ -28,7 +34,7 @@ const SidebarLayout: React.FC<ISidebarLayout> = () => {
   const pathname = usePathname();
 
   // States pour la gestion du sidebar et du menu mobile
-  const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(initialExpanded);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Récupération des éléments de navigation
@@ -59,7 +65,11 @@ const SidebarLayout: React.FC<ISidebarLayout> = () => {
 
   // Fonction pour toggle le sidebar
   const toggleSidebar = () => {
-    setIsSidebarExpanded(!isSidebarExpanded);
+    const newState = !isSidebarExpanded;
+    setIsSidebarExpanded(newState);
+    if (onToggle) {
+      onToggle(newState);
+    }
   };
 
   // Fonction pour toggle le menu mobile
@@ -118,10 +128,6 @@ const SidebarLayout: React.FC<ISidebarLayout> = () => {
                         active={item.active}
                         isSidebarExpanded={true}
                         onClick={toggleMobileMenu}
-                        isDropdown={item.isDropdown}
-                        dropdownOpen={item.dropdownOpen}
-                        toggleDropdown={item.toggleDropdown}
-                        subItems={item.subItems}
                       />
                     </Fragment>
                   );
@@ -142,10 +148,6 @@ const SidebarLayout: React.FC<ISidebarLayout> = () => {
                         active={item.active}
                         isSidebarExpanded={true}
                         onClick={toggleMobileMenu}
-                        isDropdown={item.isDropdown}
-                        dropdownOpen={item.dropdownOpen}
-                        toggleDropdown={item.toggleDropdown}
-                        subItems={item.subItems}
                       />
                     </Fragment>
                   );
@@ -225,10 +227,6 @@ const SidebarLayout: React.FC<ISidebarLayout> = () => {
                             path={item.href}
                             active={item.active}
                             isSidebarExpanded={isSidebarExpanded}
-                            isDropdown={item.isDropdown}
-                            dropdownOpen={item.dropdownOpen}
-                            toggleDropdown={item.toggleDropdown}
-                            subItems={item.subItems}
                           />
                         </div>
                       </Fragment>
@@ -251,10 +249,6 @@ const SidebarLayout: React.FC<ISidebarLayout> = () => {
                           path={item.href}
                           active={item.active}
                           isSidebarExpanded={isSidebarExpanded}
-                          isDropdown={item.isDropdown}
-                          dropdownOpen={item.dropdownOpen}
-                          toggleDropdown={item.toggleDropdown}
-                          subItems={item.subItems}
                         />
                       </div>
                     </Fragment>

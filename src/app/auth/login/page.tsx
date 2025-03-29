@@ -112,18 +112,19 @@ export default function LoginPage() {
 
   return (
     // Container principal avec mise en page responsive
-    <div className="mt-10 max-w-screen-lg sm:max-w-full min-h-screen overflow-hidden flex flex-col lg:mt-0 lg:flex-row items-center justify-center">
+    <div className="flex min-h-screen flex-col p-4 sm:p-6 md:p-8 lg:p-12 lg:flex-row items-center justify-center">
       {/* Section gauche : Formulaire de connexion */}
-      <div className="flex-1 max-w-[584px]">
-        {/* En-tête du formulaire */}
-        <h2 className="text-4xl sm:text-5xl font-bold gap-5 mb-2 sm:mb-5">
-          Content de vous revoir !
-        </h2>
-        <p className="mt-0 mb-12 text-md md:text-2xl lg:text-2xl">
-          Connectez-vous à votre compte Locasmart
-        </p>
+      <div className="w-full lg:w-1/2 max-w-[584px] space-y-6 md:space-y-8">
+        <div className="space-y-3 md:space-y-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold">
+            Content de vous revoir&nbsp;!
+          </h2>
+          <p className="text-lg md:text-xl lg:text-2xl">
+            Connectez-vous à votre compte Lumea
+          </p>
+        </div>
 
-        {/* Affichage des erreurs globales */}
+          {/* Affichage des erreurs globales */}
         {globalError && (
           <div
             className="bg-red-50 border-l-4 border-red-500 p-4 mb-6"
@@ -134,7 +135,10 @@ export default function LoginPage() {
         )}
 
         {/* Formulaire de connexion */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form 
+          onSubmit={handleSubmit(onSubmit)} 
+          className="space-y-4 sm:space-y-6 mt-6 md:mt-8 w-full"
+        >
           {/* Champ email avec validation */}
           <Input
             {...register('email')}
@@ -166,7 +170,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={!isValid || isLoading}
-            className="w-full py-3 px-4 mt-8 bg-gradient-to-r from-[#165baa] to-[#707fff] text-white rounded-full font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center space-x-2"
+            className="w-full py-3 px-4 mt-6 md:mt-8 bg-gradient-to-r from-[#165baa] to-[#707fff] text-white rounded-full font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center space-x-2"
           >
             {isLoading ? (
               // Affichage du spinner pendant le chargement
@@ -201,7 +205,7 @@ export default function LoginPage() {
       </div>
 
       {/* Section droite : Image décorative (masquée sur mobile) */}
-      <div className="hidden lg:flex justify-center p-6 ml-16">
+      <div className="hidden lg:flex lg:w-1/2 lg:justify-center lg:items-center">
         <Image
           src="/images/connexion_page.png"
           alt="Illustration de connexion"

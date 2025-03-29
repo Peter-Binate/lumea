@@ -1,28 +1,15 @@
 import {
   Bell,
+  Car,
   Clapperboard,
   House,
   LifeBuoy,
-  MapPin,
   Settings,
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
 
 export const NavItems = () => {
   const pathname = usePathname();
-
-  // État pour gérer l'ouverture/fermeture du dropdown "Vos tours"
-  const [isToursDropdownOpen, setIsToursDropdownOpen] = useState(false);
-
-  // Définition des sous-liens du dropdown "Vos tours"
-  const toursSubItems = [
-    {
-      name: 'Véhicules',
-      href: '/portfolio/cars',
-      active: pathname === '/portfolio/cars',
-    },
-  ];
 
   return [
     // Liens de navigation principaux
@@ -41,15 +28,11 @@ export const NavItems = () => {
       position: 'top',
     },
     {
-      name: 'Portefeuilles',
-      icon: <MapPin size={20} />,
-      href: '/portfolio',
-      active: pathname.startsWith('/portfolio'),
+      name: 'Véhicules',
+      href: '/cars',
+      icon: <Car size={20} />,
+      active: pathname === '/cars',
       position: 'top',
-      isDropdown: true,
-      dropdownOpen: isToursDropdownOpen,
-      toggleDropdown: () => setIsToursDropdownOpen(!isToursDropdownOpen),
-      subItems: toursSubItems,
     },
     {
       name: 'Notifications',

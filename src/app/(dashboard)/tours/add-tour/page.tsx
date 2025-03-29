@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/app/components/ui/Button';
+import CompartmentRadioButton from '@/app/components/ui/CompartmentRadioButton';
 import Input from '@/app/components/ui/Input';
 import { useTour } from '@/lib/hooks/useTour';
 import { useRouter } from 'next/navigation';
@@ -45,9 +46,8 @@ export default function AddTourPage() {
 
   return (
     <div className="container max-w-2xl mx-auto py-8">
-      <div className="bg-white rounded-lg shadow">
         {/* En-tête */}
-        <div className="border-b px-6 py-4">
+        <div className="border-b px-6 py-4 w-full">
           <h1 className="text-xl font-semibold">🎥 Nouvelle visite</h1>
         </div>
 
@@ -78,6 +78,15 @@ export default function AddTourPage() {
                 />
               </div>
 
+              {/* Champs de sélection */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Type de tour
+                </label>
+                <CompartmentRadioButton />
+              </div>
+              
+
               {/* Zone de drop pour la vidéo */}
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center">
                 <div className="text-gray-400">
@@ -103,6 +112,5 @@ export default function AddTourPage() {
           </div>
         </form>
       </div>
-    </div>
   );
 }

@@ -1,3 +1,4 @@
+import { Compartment } from '@/types/tour';
 import { httpClient } from './httpClient';
 
 // Types des status possibles pour une visite
@@ -25,14 +26,11 @@ export interface Tour {
   status: TourStatus;
   created_at: string;
   updated_at: string;
-  property?: {
+  car?: {
     id: string;
     title: string;
   };
-  room?: {
-    id: string;
-    title: string;
-  };
+  compartment?: Compartment[];
   video?: string;
 }
 

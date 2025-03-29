@@ -1,16 +1,17 @@
 'use client';
 
 import { Button } from '@/app/components/ui/Button';
+import { PageTitle } from "@/app/components/ui/PageTitle";
 import { TourInformation } from '@/app/components/ui/TourInformation';
 import { useTour } from '@/lib/hooks/useTour';
 import { Tour } from '@/services/api/tourService';
 import { DASHBOARD_HEADERS_CONFIG } from '@/types/dashboard';
 import { Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import TourDashboardTemplate from '../../components/templates/dashboard/TourDashboardTemplate';
 
-export default function ToursPage() {
+export const ToursPage = () => {
   const [selectedTour, setSelectedTour] = useState<Tour | undefined>();
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const router = useRouter();
@@ -30,15 +31,10 @@ export default function ToursPage() {
     setIsInfoOpen(true);
   };
 
-  useEffect(() => {
-    console.log('isInfoOpen a changé :', isInfoOpen);
-  }, [isInfoOpen]);
-
   return (
     <>
-      <h1 className="text-slate-900 text-[28px] font-semibold mt-8 mb-8 sm:mt-0">
-        Vos tours
-      </h1>
+      <PageTitle title='Vos tours' emoji='🗺️' />
+      
       <TourDashboardTemplate
         isLoading={isLoading}
         error={error}
@@ -71,4 +67,6 @@ export default function ToursPage() {
       />
     </>
   );
-}
+};
+
+export default ToursPage;
