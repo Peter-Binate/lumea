@@ -10,6 +10,7 @@ import { Vehicle } from '@/services/api/vehicleService';
 import { DASHBOARD_HEADERS_CONFIG } from '@/types/dashboard';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
+import { PageTitle } from '../../components/ui/PageTitle';
 
 export default function VehiclesPage() {
   // État local uniquement pour le formulaire
@@ -59,9 +60,8 @@ export default function VehiclesPage() {
 
   return (
     <>
-      <h1 className="text-slate-900 text-[28px] font-semibold mt-8 mb-8 sm:mt-0">
-        🚗 Vos véhicules
-      </h1>
+      <PageTitle title="Vos véhicules" emoji="🚗" />
+
       <VehicleDashboardTemplate
         isLoading={isLoading}
         error={error}

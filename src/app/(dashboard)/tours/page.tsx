@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/app/components/ui/Button';
-import { PageTitle } from "@/app/components/ui/PageTitle";
+import { PageTitle } from '@/app/components/ui/PageTitle';
 import { TourInformation } from '@/app/components/ui/TourInformation';
 import { useTour } from '@/lib/hooks/useTour';
 import { Tour } from '@/services/api/tourService';
@@ -33,8 +33,8 @@ export const ToursPage = () => {
 
   return (
     <>
-      <PageTitle title='Vos tours' emoji='🗺️' />
-      
+      <PageTitle title="Vos tours" emoji="🗺️" />
+
       <TourDashboardTemplate
         isLoading={isLoading}
         error={error}
@@ -44,7 +44,6 @@ export const ToursPage = () => {
       >
         {/* En-tête avec bouton d'ajout */}
         <div className="mt-6 md:mt-0">
-          {/* <Button className="w-full" onClick={() => setIsInfoOpen(true)}> */}
           <Button
             className="w-full"
             onClick={

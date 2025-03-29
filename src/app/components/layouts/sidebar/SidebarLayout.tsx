@@ -189,7 +189,7 @@ const SidebarLayout: React.FC<ISidebarLayout> = ({
             'border-r transition-all duration-300 ease-in-out transform hidden sm:flex h-screen bg-white'
           )}
         >
-          <aside className="flex h-full flex-col w-full break-words px-4 overflow-x-hidden columns-1">
+          <aside className="flex h-full flex-col w-full break-words px-4 overflow-hidden columns-1">
             {/* Logo */}
             {isSidebarExpanded ? (
               <div className="mt-8 relative pb-2">
