@@ -3,19 +3,13 @@
 import { NavItems } from '@/app/components/layouts/sidebar/config';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { cn } from '@/lib/utils/styling/class-names';
-import {
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  LogOut,
-  X,
-} from 'lucide-react';
+import { ChevronLeft, ChevronRight, LogOut, X } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Fragment, useEffect, useState } from 'react';
 import ProfileImage from '../../ui/ProfileImage';
 import HeaderLayout from '../header/HeaderLayout';
+import SideNavItem from './SideNavItem';
 
 export interface ISidebarLayout {
   onToggle?: (expanded: boolean) => void;
@@ -117,42 +111,38 @@ const SidebarLayout: React.FC<ISidebarLayout> = ({
           <div className="flex-1 overflow-y-auto px-4">
             {/* Navigation du haut */}
             <div className="mt-4">
-              {navItems.map((item, index) => {
-                if (item.position === 'top') {
-                  return (
-                    <Fragment key={index}>
-                      <SideNavItem
-                        label={item.name}
-                        icon={item.icon}
-                        path={item.href}
-                        active={item.active}
-                        isSidebarExpanded={true}
-                        onClick={toggleMobileMenu}
-                      />
-                    </Fragment>
-                  );
-                }
-              })}
+              {navItems
+                .filter((item) => item.position === 'top')
+                .map((item, index) => (
+                  <Fragment key={index}>
+                    <SideNavItem
+                      label={item.name}
+                      icon={item.icon}
+                      path={item.href}
+                      active={item.active}
+                      isSidebarExpanded={true}
+                      onClick={toggleMobileMenu}
+                    />
+                  </Fragment>
+                ))}
             </div>
 
             {/* Navigation du bas */}
             <div className="mt-auto">
-              {navItems.map((item, index) => {
-                if (item.position === 'bottom') {
-                  return (
-                    <Fragment key={index}>
-                      <SideNavItem
-                        label={item.name}
-                        icon={item.icon}
-                        path={item.href}
-                        active={item.active}
-                        isSidebarExpanded={true}
-                        onClick={toggleMobileMenu}
-                      />
-                    </Fragment>
-                  );
-                }
-              })}
+              {navItems
+                .filter((item) => item.position === 'bottom')
+                .map((item, index) => (
+                  <Fragment key={index}>
+                    <SideNavItem
+                      label={item.name}
+                      icon={item.icon}
+                      path={item.href}
+                      active={item.active}
+                      isSidebarExpanded={true}
+                      onClick={toggleMobileMenu}
+                    />
+                  </Fragment>
+                ))}
             </div>
           </div>
 
@@ -216,31 +206,9 @@ const SidebarLayout: React.FC<ISidebarLayout> = ({
             {/* Navigation du haut */}
             <div className="mt-4 relative pb-2">
               <div className="flex flex-col space-y-1">
-                {navItems.map((item, index) => {
-                  if (item.position === 'top') {
-                    return (
-                      <Fragment key={index}>
-                        <div className="space-y-1">
-                          <SideNavItem
-                            label={item.name}
-                            icon={item.icon}
-                            path={item.href}
-                            active={item.active}
-                            isSidebarExpanded={isSidebarExpanded}
-                          />
-                        </div>
-                      </Fragment>
-                    );
-                  }
-                })}
-              </div>
-            </div>
-
-            {/* Navigation du bas */}
-            <div className="sticky bottom-0 mt-auto whitespace-nowrap transition duration-200 block">
-              {navItems.map((item, index) => {
-                if (item.position === 'bottom') {
-                  return (
+                {navItems
+                  .filter((item) => item.position === 'top')
+                  .map((item, index) => (
                     <Fragment key={index}>
                       <div className="space-y-1">
                         <SideNavItem
@@ -252,9 +220,27 @@ const SidebarLayout: React.FC<ISidebarLayout> = ({
                         />
                       </div>
                     </Fragment>
-                  );
-                }
-              })}
+                  ))}
+              </div>
+            </div>
+
+            {/* Navigation du bas */}
+            <div className="sticky bottom-0 mt-auto whitespace-nowrap transition duration-200 block">
+              {navItems
+                .filter((item) => item.position === 'bottom')
+                .map((item, index) => (
+                  <Fragment key={index}>
+                    <div className="space-y-1">
+                      <SideNavItem
+                        label={item.name}
+                        icon={item.icon}
+                        path={item.href}
+                        active={item.active}
+                        isSidebarExpanded={isSidebarExpanded}
+                      />
+                    </div>
+                  </Fragment>
+                ))}
             </div>
 
             {/* Section profil desktop */}
@@ -308,160 +294,6 @@ const SidebarLayout: React.FC<ISidebarLayout> = ({
           </div>
         </div>
       </div>
-    </>
-  );
-};
-
-export const SideNavItem: React.FC<{
-  label: string;
-  icon: any;
-  path: string;
-  active: boolean;
-  isSidebarExpanded: boolean;
-  onClick?: () => void;
-  isDropdown?: boolean;
-  dropdownOpen?: boolean;
-  toggleDropdown?: () => void;
-  subItems?: Array<{
-    name: string;
-    href: string;
-    active: boolean;
-  }>;
-}> = ({
-  label,
-  icon,
-  path,
-  active,
-  isSidebarExpanded,
-  onClick,
-  isDropdown,
-  dropdownOpen,
-  toggleDropdown,
-  subItems,
-}) => {
-  return (
-    <>
-      {!onClick ? (
-        // Desktop version
-        <>
-          {isDropdown ? (
-            <div className="relative">
-              <div
-                onClick={toggleDropdown}
-                className={`h-full relative flex items-center whitespace-nowrap rounded-md cursor-pointer ${
-                  active
-                    ? 'font-base text-sm bg-neutral-200 text-[#5a6eb6] font-semibold shadow-sm hover:text-[#5a6eb6] dark:bg-[#f3f6fb] dark:hover:text-[#5a6eb6]'
-                    : 'hover:bg-neutral-200 hover:hover:text-[#5a6eb6] font-semibold dark:text-slate-700 dark:hover:bg-[#f3f6fb] dark:hover:text-[#5a6eb6]'
-                }`}
-              >
-                <div className="relative font-base text-sm py-1.5 px-2 flex flex-row items-center space-x-2 rounded-md duration-100">
-                  {icon}
-                  {isSidebarExpanded && (
-                    <>
-                      <span>{label}</span>
-                      <ChevronDown
-                        size={16}
-                        className={`transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}
-                      />
-                    </>
-                  )}
-                </div>
-              </div>
-              {isSidebarExpanded && dropdownOpen && (
-                <div className="pl-4 mt-1 space-y-1">
-                  {subItems?.map((subItem) => (
-                    <Link
-                      key={subItem.href}
-                      href={subItem.href}
-                      className={`block py-1 px-2 text-sm rounded-md ${
-                        subItem.active
-                          ? 'bg-neutral-200 text-[#5a6eb6]'
-                          : 'hover:bg-neutral-200'
-                      }`}
-                    >
-                      {subItem.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          ) : (
-            // Existing desktop nav item logic remains the same
-            <Link
-              href={path}
-              className={`h-full relative flex items-center whitespace-nowrap rounded-md ${
-                active
-                  ? 'font-base text-sm bg-neutral-200 text-[#5a6eb6] font-semibold shadow-sm hover:text-[#5a6eb6] dark:bg-[#f3f6fb] dark:hover:text-[#5a6eb6]'
-                  : 'hover:bg-neutral-200 hover:hover:text-[#5a6eb6] font-semibold dark:text-slate-700 dark:hover:bg-[#f3f6fb] dark:hover:text-[#5a6eb6]'
-              }`}
-            >
-              <div className="relative font-base text-sm py-1.5 px-2 flex flex-row items-center space-x-2 rounded-md duration-100">
-                {icon}
-                {isSidebarExpanded && <span>{label}</span>}
-              </div>
-            </Link>
-          )}
-        </>
-      ) : (
-        // Mobile version (similar updates needed)
-        <div>
-          {isDropdown ? (
-            <div>
-              <div
-                onClick={toggleDropdown}
-                className={`h-full relative flex items-center whitespace-nowrap rounded-md ${
-                  active
-                    ? 'font-base text-sm bg-neutral-200 text-[#5a6eb6] font-semibold shadow-sm hover:text-[#5a6eb6]'
-                    : 'hover:bg-neutral-200 hover:hover:text-[#5a6eb6] font-semibold dark:text-slate-700'
-                }`}
-              >
-                <div className="relative font-base text-sm py-1.5 px-2 flex flex-row items-center space-x-2 rounded-md duration-100">
-                  {icon}
-                  <span>{label}</span>
-                  <ChevronDown
-                    size={16}
-                    className={`transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}
-                  />
-                </div>
-              </div>
-              {dropdownOpen && (
-                <div className="pl-4 mt-1 space-y-1">
-                  {subItems?.map((subItem) => (
-                    <Link
-                      key={subItem.href}
-                      href={subItem.href}
-                      onClick={onClick}
-                      className={`block py-1 px-2 text-sm rounded-md ${
-                        subItem.active
-                          ? 'bg-red-700 text-[#5a6eb6]'
-                          : 'hover:bg-neutral-200 hover:hover:text-[#5a6eb6]'
-                      }`}
-                    >
-                      {subItem.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          ) : (
-            // Existing mobile nav item logic remains the same
-            <Link
-              href={path}
-              onClick={onClick}
-              className={`h-full relative flex items-center whitespace-nowrap rounded-md ${
-                active
-                  ? 'font-base text-sm bg-neutral-200 text-[#5a6eb6] font-semibold shadow-sm hover:text-[#5a6eb6] dark:bg-[#f3f6fb] dark:hover:text-[#5a6eb6]'
-                  : 'hover:bg-neutral-200 hover:hover:text-[#5a6eb6] font-semibold dark:text-slate-700 dark:hover:bg-[#f3f6fb] dark:hover:text-[#5a6eb6]'
-              }`}
-            >
-              <div className="relative font-base text-sm py-1.5 px-2 flex flex-row items-center space-x-2 rounded-md duration-100">
-                {icon}
-                <span>{label}</span>
-              </div>
-            </Link>
-          )}
-        </div>
-      )}
     </>
   );
 };

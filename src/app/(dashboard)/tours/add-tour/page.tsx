@@ -1,8 +1,8 @@
 'use client';
 
 import { Button } from '@/app/components/ui/Button';
-import CompartmentRadioButton from '@/app/components/ui/CompartmentRadioButton';
 import Input from '@/app/components/ui/Input';
+import { TourTypeRadio } from '@/app/components/ui/tour-type-radio';
 import { useTour } from '@/lib/hooks/useTour';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -19,6 +19,7 @@ export default function AddTourPage() {
     description: '',
     property_id: '',
     room_id: '',
+    tour_type: '',
   });
 
   // Gestionnaire de changement des champs
@@ -30,6 +31,14 @@ export default function AddTourPage() {
         [field]: e.target.value,
       }));
     };
+
+  // Gestionnaire pour le changement du type de tour
+  const handleTourTypeChange = (value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      tourType: value,
+    }));
+  };
 
   // Soumission du formulaire
   const handleSubmit = async (e: React.FormEvent) => {
@@ -82,7 +91,7 @@ export default function AddTourPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Type de tour
               </label>
-              <CompartmentRadioButton />
+              <TourTypeRadio onChange={handleTourTypeChange} />
             </div>
 
             {/* Zone de drop pour la vidéo */}

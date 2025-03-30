@@ -2,13 +2,14 @@
 
 import { useAuth } from '@/app/contexts/AuthContext';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import SidebarLayout from './sidebar/SidebarLayout';
-import { useState } from 'react';
 
 export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();
   const pathname = usePathname();
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
+  const [isDesktop, setIsDesktop] = useState(false);
 
   // Vérifier si le chemin actuel fait partie des chemins d'authentification
   const isAuthPath = pathname?.startsWith('/auth');
@@ -17,6 +18,20 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
   const handleSidebarToggle = (expanded: boolean) => {
     setIsSidebarExpanded(expanded);
   };
+
+  useEffect(() => {
+    const checkIfDesktop = () => {
+      setIsDesktop(window.innerWidth >= 640);
+    };
+
+    // Initial verification
+    checkIfDesktop();
+
+    window.addEventListener('resize', checkIfDesktop);
+
+    // Clean eventListener
+    return () => window.removeEventListener('resize', checkIfDesktop);
+  }, []);
 
   // Si l'utilisateur est authentifié et n'est pas sur une page d'authentification, on applique le layout avec flex et sidebar
   if (isAuthenticated && !isAuthPath) {
@@ -31,9 +46,13 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
 
         <main
           className="flex-1 transition-all duration-300 ease-in-out
-          overflow-y-auto h-screen"
+          overflow-y-auto h-screen pt-14 sm:pt-0"
           style={{
-            marginLeft: isSidebarExpanded ? '248px' : '68px',
+            marginLeft: isDesktop
+              ? isSidebarExpanded
+                ? '248px'
+                : '68px'
+              : '0',
           }}
         >
           <div
