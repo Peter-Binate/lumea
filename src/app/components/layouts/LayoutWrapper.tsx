@@ -45,8 +45,7 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
         </div>
 
         <main
-          className="flex-1 transition-all duration-300 ease-in-out
-          overflow-y-auto h-screen pt-14 sm:pt-0"
+          className="flex-1 transition-all duration-300 ease-in-out h-screen pt-14 sm:pt-0"
           style={{
             marginLeft: isDesktop
               ? isSidebarExpanded

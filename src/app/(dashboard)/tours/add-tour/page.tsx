@@ -60,7 +60,7 @@ export default function AddTourPage() {
               />
             </div>
 
-            <div className="p-6 max-h-[600px] overflow-y-auto">
+            <div className="p-6 max-h-[600px] overflow-y-auto pr-2">
               <MediaUploader onFilesUpdated={setUploadedFiles} maxFiles={20} />
             </div>
           </div>

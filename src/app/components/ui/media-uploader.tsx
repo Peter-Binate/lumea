@@ -122,7 +122,7 @@ export const MediaUploader = ({
   }, [files]);
 
   return (
-    <>
+    <div className="space-y-4 w-full">
       <h2 className="text-lg font-medium text-gray-800 mb-4">Média</h2>
 
       <div className="space-y-4">
@@ -167,7 +167,7 @@ export const MediaUploader = ({
           <FilePreviewGrid files={files} onRemove={removeFile} />
         )}
       </div>
-    </>
+    </div>
   );
 };
 
@@ -177,7 +177,7 @@ type FilePreviewGridProps = {
   onRemove: (id: string) => void;
 };
 
-const FilePreviewGrid = ({ files, onRemove }: FilePreviewGridProps) => (
+export const FilePreviewGrid = ({ files, onRemove }: FilePreviewGridProps) => (
   <div className="mt-4">
     <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3">
       {files.map((fileItem) => (
@@ -197,7 +197,10 @@ type FilePreviewCardProps = {
   onRemove: (id: string) => void;
 };
 
-const FilePreviewCard = ({ fileItem, onRemove }: FilePreviewCardProps) => (
+export const FilePreviewCard = ({
+  fileItem,
+  onRemove,
+}: FilePreviewCardProps) => (
   <Card className="overflow-hidden">
     <div className="relative aspect-square">
       {fileItem.preview ? (
