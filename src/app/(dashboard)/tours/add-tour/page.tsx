@@ -84,31 +84,41 @@ const ActionButtons = ({
   isSubmitting: boolean;
 }) => (
   <>
+    {/* Desktop version - horizontal buttons */}
     <div className="hidden lg:flex justify-center gap-4 mt-6">
       <Button
         type="button"
         variant="outline"
-        className="w-32"
+        className="w-56 h-12 text-base"
         onClick={onCancel}
       >
         Annuler
       </Button>
-      <Button type="submit" className="w-32" disabled={isSubmitting}>
+      <Button
+        type="submit"
+        className="w-56 h-12 text-base"
+        disabled={isSubmitting}
+      >
         {isSubmitting ? 'Création...' : 'Confirmer'}
       </Button>
     </div>
 
-    <div className="lg:hidden flex gap-4 mt-4">
+    {/* Mobile version - vertical buttons */}
+    <div className="lg:hidden flex flex-col gap-4 mt-4">
+      <Button
+        type="submit"
+        className="w-full h-12 text-base"
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? 'Création...' : 'Confirmer'}
+      </Button>
       <Button
         type="button"
         variant="outline"
-        className="flex-1"
+        className="w-full h-12 text-base"
         onClick={onCancel}
       >
         Annuler
-      </Button>
-      <Button type="submit" className="flex-1" disabled={isSubmitting}>
-        {isSubmitting ? 'Création...' : 'Confirmer'}
       </Button>
     </div>
   </>
