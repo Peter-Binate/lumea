@@ -11,7 +11,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/app/components/ui/alert-dialog";
+import { Badge } from "@/app/components/ui/badge";
 import { Button } from '@/app/components/ui/button';
+import { Checkbox } from "@/app/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -26,6 +28,7 @@ import {
   PaginationContent,
   PaginationItem,
 } from "@/app/components/ui/pagination";
+import { Popover, PopoverContent, PopoverTrigger } from "@/app/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -41,11 +44,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/app/components/ui/Table/table";
+import { cn } from "@/lib/utils";
 import { Vehicle } from "@/services/api/vehicleService";
 import { multiColumnFilterFn } from "@/types/table";
 import {
   ColumnDef,
   ColumnFiltersState,
+  FilterFn,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -70,6 +75,7 @@ import {
   Columns3Icon,
   Edit,
   Eye,
+  FilterIcon,
   ListFilterIcon,
   PlusIcon,
   Trash2,
@@ -84,12 +90,12 @@ interface VehicleTableProps {
   onView?: (vehicle: Vehicle) => void;
 }
 
-export function VehicleTable({
+export const VehicleTable = ({
   data,
   onDelete,
   onEdit,
   onView,
-}: VehicleTableProps) {
+}: VehicleTableProps) => {
   // État pour le tableau
   const [sorting, setSorting] = useState<SortingState>([
     { id: "created_at", desc: true }
@@ -101,6 +107,9 @@ export function VehicleTable({
     pageSize: 5,
   });
   const inputRef = useRef<HTMLInputElement>(null);
+  
+  // Génération d'un ID unique pour les checkboxes de statut
+  const tableId = useMemo(() => `vehicle-table-${Math.random().toString(36).substring(2, 9)}`, []);
 
   // Filtre personnalisé pour filtrer par statut
   const statusFilterFn: FilterFn<Vehicle> = (
@@ -131,7 +140,16 @@ export function VehicleTable({
     {
       accessorKey: "status",
       header: "Statut",
-      cell: ({ row }) => <div>{row.getValue("status")}</div>,
+      cell: ({ row }) => (
+      <Badge
+          className={cn(
+            row.getValue("status") === "Inactive" &&
+              "bg-muted-foreground/60 text-primary-foreground"
+          )}
+        >
+          {row.getValue("status")}
+        </Badge>
+      ),
       filterFn: statusFilterFn,
       enableHiding: true,
     },
@@ -212,6 +230,73 @@ export function VehicleTable({
     },
   });
 
+  // Get unique status values
+  const uniqueStatusValues = useMemo(() => {
+    if (!data.length) return []
+    
+    // Extraire tous les statuts uniques des données
+    const statusSet = new Set<string>()
+    data.forEach(vehicle => {
+      if (vehicle.status) {
+        statusSet.add(vehicle.status)
+      }
+    })
+    
+    return Array.from(statusSet).sort()
+  }, [data])
+
+  // Get counts for each status
+  const statusCounts = useMemo(() => {
+    const counts = new Map<string, number>()
+    
+    // Compter le nombre d'occurrences de chaque statut
+    data.forEach(vehicle => {
+      if (vehicle.status) {
+        const count = counts.get(vehicle.status) || 0
+        counts.set(vehicle.status, count + 1)
+      }
+    })
+    
+    return counts
+  }, [data])
+
+  // Récupérer les statuts sélectionnés
+  const selectedStatuses = useMemo(() => {
+    const filterValue = table.getColumn("status")?.getFilterValue() as string[]
+    return filterValue ?? []
+  }, [table.getColumn("status")?.getFilterValue()])
+
+  // Fonction pour gérer le changement de statut
+  const handleStatusChange = (checked: boolean, value: string) => {
+    const filterValue = table.getColumn("status")?.getFilterValue() as string[]
+    const newFilterValue = filterValue ? [...filterValue] : []
+
+    if (checked) {
+      newFilterValue.push(value)
+    } else {
+      const index = newFilterValue.indexOf(value)
+      if (index > -1) {
+        newFilterValue.splice(index, 1)
+      }
+    }
+
+    table
+      .getColumn("status")
+      ?.setFilterValue(newFilterValue.length ? newFilterValue : undefined)
+  }
+
+  // Fonction pour gérer la suppression des lignes sélectionnées
+  const handleDeleteRows = () => {
+    // Implémentation de la fonction de suppression
+    if (onDelete) {
+      table.getSelectedRowModel().rows.forEach((row) => {
+        onDelete(row.original.id);
+      });
+    }
+    // Réinitialiser la sélection
+    table.resetRowSelection();
+  };
+
   return (
     <div className="space-y-4">
       {/* Filters */}
@@ -245,7 +330,7 @@ export function VehicleTable({
             )}
           </div>
           {/* Filter by status */}
-          {/* <Popover>
+          <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline">
                 <FilterIcon
@@ -253,9 +338,9 @@ export function VehicleTable({
                   size={16}
                   aria-hidden="true"
                 />
-                Status
+                Statut
                 {selectedStatuses.length > 0 && (
-                  <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
+                  <span className="bg-background text-muted-foreground/70 -me-1 ml-2 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
                     {selectedStatuses.length}
                   </span>
                 )}
@@ -264,33 +349,39 @@ export function VehicleTable({
             <PopoverContent className="w-auto min-w-36 p-3" align="start">
               <div className="space-y-3">
                 <div className="text-muted-foreground text-xs font-medium">
-                  Filters
+                  Filtres
                 </div>
                 <div className="space-y-3">
-                  {uniqueStatusValues.map((value, i) => (
-                    <div key={value} className="flex items-center gap-2">
-                      <Checkbox
-                        id={`${id}-${i}`}
-                        checked={selectedStatuses.includes(value)}
-                        onCheckedChange={(checked: boolean) =>
-                          handleStatusChange(checked, value)
-                        }
-                      />
-                      <Label
-                        htmlFor={`${id}-${i}`}
-                        className="flex grow justify-between gap-2 font-normal"
-                      >
-                        {value}{" "}
-                        <span className="text-muted-foreground ms-2 text-xs">
-                          {statusCounts.get(value)}
-                        </span>
-                      </Label>
+                  {uniqueStatusValues.length > 0 ? (
+                    uniqueStatusValues.map((value, i) => (
+                      <div key={value} className="flex items-center gap-2">
+                        <Checkbox
+                          id={`${tableId}-status-${i}`}
+                          checked={selectedStatuses.includes(value)}
+                          onCheckedChange={(checked) =>
+                            handleStatusChange(!!checked, value)
+                          }
+                        />
+                        <Label
+                          htmlFor={`${tableId}-status-${i}`}
+                          className="flex grow justify-between gap-2 font-normal"
+                        >
+                          {value}{" "}
+                          <span className="text-muted-foreground ms-2 text-xs">
+                            {statusCounts.get(value) || 0}
+                          </span>
+                        </Label>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-muted-foreground text-sm">
+                      Aucun statut disponible
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
             </PopoverContent>
-          </Popover> */}
+          </Popover>
           {/* Toggle columns visibility */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -300,7 +391,7 @@ export function VehicleTable({
                   size={16}
                   aria-hidden="true"
                 />
-                View
+                Colonne
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -447,7 +538,7 @@ export function VehicleTable({
         </Table>
       </div>
 
-      {/* Pagination - Version améliorée */}
+      {/* Pagination */}
       <div className="flex items-center justify-between gap-8">
         {/* Sélection du nombre de lignes par page */}
         <div className="flex items-center gap-3">
