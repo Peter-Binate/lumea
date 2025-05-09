@@ -1,54 +1,56 @@
-import { cn } from '@/lib/utils/styling/class-names'; // Fonction utilitaire pour combiner des classes
-import * as React from 'react';
+import { Slot } from "@radix-ui/react-slot"
+import { cva, type VariantProps } from "class-variance-authority"
+import * as React from "react"
+
+import { cn } from "@/lib/utils"
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  {
+    variants: {
+      variant: {
+        default: "bg-[#5a6eb6] text-white text-primary-foreground hover:bg-indigo-700",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline:
+          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 hover:underline",
+      },
+      size: {
+        default: "h-10 px-4 py-2",
+        sm: "h-9 rounded-md px-3",
+        lg: "h-11 rounded-md px-8",
+        icon: "h-10 w-10",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+)
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?:
-    | 'primary'
-    | 'secondary'
-    | 'accent'
-    | 'destructive'
-    | 'ghost'
-    | 'link'
-    | 'outline';
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'icon';
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = 'primary', size = 'md', ...props }, ref) => {
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button"
     return (
-      <button
-        className={cn(
-          'btn', // Classe de base pour le style de bouton
-          {
-            // Styles dynamiques selon les variantes
-            'bg-[#5a6eb6] text-white hover:bg-indigo-700':
-              variant === 'primary',
-            'bg-gray-200 text-gray-700 hover:bg-gray-300':
-              variant === 'secondary',
-            'bg-yellow-500 text-black hover:bg-yellow-600':
-              variant === 'accent',
-            'bg-[#D92D20] text-white hover:bg-red-200':
-              variant === 'destructive',
-            'bg-transparent text-gray-600 hover:bg-gray-100':
-              variant === 'ghost',
-            'text-indigo-600 underline hover:text-indigo-700':
-              variant === 'link',
-            'border border-indigo-600 text-indigo-600 hover:bg-indigo-100':
-              variant === 'outline',
-            'btn-lg': size === 'lg',
-            'btn-md': size === 'md',
-            'btn-sm': size === 'sm',
-            'btn-xs': size === 'xs',
-          },
-          className // Permet d'ajouter des classes personnalisées
-        )}
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
         {...props}
       />
-    );
+    )
   }
-);
-Button.displayName = 'Button';
+)
+Button.displayName = "Button"
 
-export { Button };
+export { Button, buttonVariants }

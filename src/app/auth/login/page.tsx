@@ -2,7 +2,7 @@
 'use client';
 
 // Imports des dépendances nécessaires
-import Input from '@/app/components/ui/Input';
+import { Input } from '@/app/components/ui/Input';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { loginSchema, type LoginFormData } from '@/utils/validation/schemas';
 import { yupResolver } from '@hookform/resolvers/yup';

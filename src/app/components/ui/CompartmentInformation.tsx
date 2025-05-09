@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/app/components/ui/Button';
+import { Button } from '@/app/components/ui/Button_old';
 //import { Compartment, TOUR_VIEW_CHOICES, TourViewChoiceType } from '@/types/tour';
 import { Edit, PlayCircle, Trash2 } from 'lucide-react';
 

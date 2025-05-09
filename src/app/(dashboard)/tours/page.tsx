@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/app/components/ui/Button';
+import { Button } from '@/app/components/ui/Button_old';
 import { PageTitle } from '@/app/components/ui/PageTitle';
 import { TourInformation } from '@/app/components/ui/TourInformation';
 import { useTour } from '@/lib/hooks/useTour';

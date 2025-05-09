@@ -1,4 +1,4 @@
-import Input from '@/app/components/ui/Input';
+import Input from '@/app/components/ui/Input_old';
 import { TourTypeRadio } from '@/app/components/ui/tour-type-radio';
 import { TourFormData } from '@/types/tour';
 

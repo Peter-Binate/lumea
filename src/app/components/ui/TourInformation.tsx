@@ -1,4 +1,4 @@
-import { Button } from '@/app/components/ui/Button';
+import { Button } from '@/app/components/ui/Button_old';
 import { Tour } from '@/services/api/tourService';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';

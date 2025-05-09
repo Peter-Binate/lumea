@@ -12,7 +12,7 @@ export default function PortfolioLayout({
 }) {
   return (
     <div className="min-h-screen">
-      <div className="mx-auto w-full max-w-6xl border-2 border-red-500">
+      <div className="mx-auto w-full max-w-6xl">
         {children}
       </div>
     </div>

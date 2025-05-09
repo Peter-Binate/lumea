@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/app/components/ui/Button';
+import { Button } from '@/app/components/ui/Button_old';
 import type { Tour } from '@/services/api/tourService';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';

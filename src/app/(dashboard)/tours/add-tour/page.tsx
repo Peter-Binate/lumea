@@ -1,7 +1,7 @@
 'use client';
 
 import { TourInfoForm } from '@/app/components/forms/TourInfoForm/tour-info-form';
-import { Button } from '@/app/components/ui/Button';
+import { Button } from '@/app/components/ui/Button_old';
 import { MediaUploader } from '@/app/components/ui/media-uploader';
 import { useTour } from '@/lib/hooks/useTour';
 import { TourFormData } from '@/types/tour';
