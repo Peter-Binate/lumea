@@ -1,6 +1,7 @@
-import Input from '@/app/components/ui/Input_old';
-import { TourTypeRadio } from '@/app/components/ui/tour-type-radio';
-import { TourFormData } from '@/types/tour';
+import { Input } from '@/app/components/ui/Input';
+import { VehicleSelect } from '@/app/components/ui/vehicle-select';
+import { ViewTypeSelect } from '@/app/components/ui/view-type-select';
+import { TourFormData, TourViewChoiceType } from '@/types/tour';
 
 type TourInfoFormProps = {
   formData: TourFormData;
@@ -17,8 +18,12 @@ export const TourInfoForm = ({
       updateFormData({ [field]: e.target.value });
     };
 
-  const handleTourTypeChange = (value: string) => {
-    updateFormData({ tour_type: value });
+  const handleVehicleChange = (value: string) => {
+    updateFormData({ vehicle: value });
+  };
+
+  const handleViewTypeChange = (value: TourViewChoiceType) => {
+    updateFormData({ view: value });
   };
 
   return (
@@ -28,10 +33,9 @@ export const TourInfoForm = ({
       </h2>
       <div className="space-y-5">
         <Input
-          label="Titre"
           value={formData.title}
           onChange={handleChange('title')}
-          placeholder="Nom de la visite"
+          placeholder="Titre de la visite"
           required
         />
 
@@ -51,9 +55,22 @@ export const TourInfoForm = ({
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Type de tour
+            Véhicule
           </label>
-          <TourTypeRadio onChange={handleTourTypeChange} />
+          <VehicleSelect
+            value={formData.vehicle}
+            onChange={handleVehicleChange}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Type de vue
+          </label>
+          <ViewTypeSelect
+            value={formData.view}
+            onChange={handleViewTypeChange}
+          />
         </div>
       </div>
     </>

@@ -5,6 +5,7 @@ import { Button } from '@/app/components/ui/Button_old';
 import { MediaUploader } from '@/app/components/ui/media-uploader';
 import { useTour } from '@/lib/hooks/useTour';
 import { TourFormData } from '@/types/tour';
+// import { TourFormData } from '@/types/tour';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { PageTitle } from '../../../components/ui/PageTitle';
@@ -16,14 +17,21 @@ export default function AddTourPage() {
   const [formData, setFormData] = useState<TourFormData>({
     title: '',
     description: '',
-    property_id: '',
-    room_id: '',
-    tour_type: '',
+    vehicle: '',
+    view: 0,
+    file: null,
   });
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
 
   const updateFormData = (newData: Partial<TourFormData>) => {
     setFormData((prev) => ({ ...prev, ...newData }));
+  };
+
+  const handleFileChange = (files: File[]) => {
+    if (files.length > 0) {
+      updateFormData({ file: files[0] });
+    } else {
+      updateFormData({ file: null });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,19 +39,35 @@ export default function AddTourPage() {
     setIsSubmitting(true);
 
     try {
-      // Combine form data with uploaded files if needed
       const tourData = {
-        ...formData,
-        files: uploadedFiles,
+        title: formData.title,
+        description: formData.description,
+        vehicle: formData.vehicle,
+        view: formData.view,
+        file: formData.file ? await fileToBase64(formData.file) : '',
       };
 
-      const success = await createTour(formData);
+      const success = await createTour(tourData);
       if (success) {
         router.push('/tours');
       }
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Fonction pour convertir un fichier en base64
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        // Extraction de la partie base64 (élimination du préfixe data:...)
+        const base64String = reader.result?.toString().split(',')[1] || '';
+        resolve(base64String);
+      };
+      reader.onerror = (error) => reject(error);
+    });
   };
 
   return (
@@ -61,7 +85,14 @@ export default function AddTourPage() {
             </div>
 
             <div className="p-6 max-h-[600px] overflow-y-auto pr-2">
-              <MediaUploader onFilesUpdated={setUploadedFiles} maxFiles={20} />
+              <h2 className="text-lg font-medium text-gray-800 mb-4">
+                Fichier vidéo
+              </h2>
+              <MediaUploader 
+                onFilesUpdated={handleFileChange} 
+                maxFiles={1} 
+                acceptedFileTypes={['.mp4', '.mov', '.webm']}
+              />
             </div>
           </div>
         </div>

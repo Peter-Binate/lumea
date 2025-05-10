@@ -19,7 +19,7 @@ export interface Compartment {
 export type TourFormData = {
   title: string;
   description: string;
-  property_id: string;
-  room_id: string;
-  tour_type: string;
+  vehicle: string;
+  view: TourViewChoiceType;
+  file: File | null;
 };

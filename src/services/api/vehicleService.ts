@@ -17,7 +17,7 @@ export const vehicleService = {
     try {
       console.log(`Récupération des propriétés de type: ${type}`);
       // TODO: Changer le nom de la route
-      const response = await httpClient.get(`tour/property/`).json<Vehicle[]>();
+      const response = await httpClient.get(`tour/vehicle/`).json<Vehicle[]>();
       return response;
     } catch (error) {
       console.error('Erreur lors de la récupération des propriétés:', error);
@@ -30,7 +30,7 @@ export const vehicleService = {
     try {
       const response = await httpClient
         // TODO: Changer le nom de la route
-        .post(`tour/property/`, {
+        .post(`tour/vehicle/`, {
           json: data,
         })
         .json();
@@ -47,7 +47,7 @@ export const vehicleService = {
     try {
       const response = await httpClient
         // TODO: Changer le nom de la route
-        .patch(`tour/property/${id}/`, {
+        .patch(`tour/vehicle/${id}/`, {
           json: data,
         })
         .json();
@@ -62,7 +62,7 @@ export const vehicleService = {
   async deleteVehicle(id: string) {
     try {
       // TODO: Changer le nom de la route
-      const response = await httpClient.delete(`tour/property/${id}/`);
+      const response = await httpClient.delete(`tour/vehicle/${id}/`);
       return response.ok;
     } catch (error) {
       console.error('Erreur lors de la suppression de la propriété:', error);

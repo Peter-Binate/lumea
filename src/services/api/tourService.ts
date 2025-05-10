@@ -18,6 +18,14 @@ export type TourStatus = Exclude<
   'pending'
 >;
 
+export interface TourCreateInput {
+  title: string;
+  description: string;
+  vehicle: string;  // ID du véhicule
+  view: number;     // Type de vue (entier)
+  file: string;     // Base64 du fichier
+}
+
 // Interface pour la structure d'une visite
 export interface Tour {
   id: string;
@@ -108,7 +116,7 @@ export const tourService = {
   },
 
   // Création d'une tour
-  async createTour(data: TourInput): Promise<Tour> {
+  async createTour(data: TourCreateInput): Promise<Tour> {
     try {
       const response = await httpClient.post('tour/tour/', {
         json: data,
