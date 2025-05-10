@@ -8,7 +8,7 @@ import {
 import BaseDashboardTemplate from './BaseDashboardTemplate';
 
 export default function VehicleDashboardTemplate(props: VehicleDashboardProps) {
-  const { data, onDelete, onEdit, onView, children } = props;
+  const { data, onDelete, onEdit, onView, onAdd, children } = props;
   const header = DASHBOARD_HEADERS_CONFIG.vehicle;
 
   // const content =
@@ -29,6 +29,7 @@ export default function VehicleDashboardTemplate(props: VehicleDashboardProps) {
     onDelete={onDelete}
     onEdit={onEdit}
     onView={onView}
+    onAdd={onAdd}
   />;
 
   return (

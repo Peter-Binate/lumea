@@ -2,12 +2,9 @@
 
 import { SideForm } from '@/app/components/forms/SideForm';
 import VehicleDashboardTemplate from '@/app/components/templates/dashboard/VehicleDashboardTemplate';
-import { Button } from '@/app/components/ui/Button_old';
-import { DeleteConfirmationModal } from '@/app/components/ui/DeleteConfirmationModal';
+import { DeleteConfirmationModal } from '@/app/components/ui/delete-confirmation-modal';
 import { VehicleInformation } from '@/app/components/ui/VehicleInformation';
 import { Vehicle } from '@/services/api/vehicleService';
-import { DASHBOARD_HEADERS_CONFIG } from '@/types/dashboard';
-import { Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { PageTitle } from '../../components/ui/PageTitle';
 
@@ -78,7 +75,7 @@ export default function VehiclesPage() {
         title: data.title || 'Nouveau véhicule',
         description: data.description || 'Description par défaut',
         created_at: new Date(),
-        rooms: data.rooms || 1
+        status: data.status || 'pending'
       };
       
       // Mettre à jour l'état local
@@ -165,15 +162,8 @@ export default function VehiclesPage() {
         data={vehicleMock}
         onView={handleViewVehicle}
         onDelete={handleDeleteClick}
-      >
-        {/* En-tête avec bouton d'ajout */}
-        <div className="mt-6 md:mt-0">
-          <Button className="w-full" onClick={() => setIsSideFormOpen(true)}>
-            <Plus className="mr-2" />
-            {DASHBOARD_HEADERS_CONFIG.vehicle.buttonLabel}
-          </Button>
-        </div>
-      </VehicleDashboardTemplate>
+        onAdd={() => setIsSideFormOpen(true)}
+      />
 
       {/* Formulaire côté */}
       <SideForm

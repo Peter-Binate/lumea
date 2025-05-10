@@ -3,7 +3,7 @@ import { Vehicle } from '@/services/api/vehicleService';
 
 // Props de base communes à tous les templates de dashboard
 export interface BaseDashboardProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   className?: string;
   isLoading: boolean;
   error: Error | string | null;
@@ -15,6 +15,7 @@ export interface VehicleDashboardProps extends BaseDashboardProps {
   onDelete: (id: string) => void;
   onEdit?: (Vehicle: Vehicle) => void;
   onView?: (Vehicle: Vehicle) => void;
+  onAdd?: () => void;
 }
 
 // Props spécifiques au template Tours

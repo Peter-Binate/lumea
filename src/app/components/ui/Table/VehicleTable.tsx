@@ -88,6 +88,7 @@ interface VehicleTableProps {
   onDelete?: (id: string) => void;
   onEdit?: (vehicle: Vehicle) => void;
   onView?: (vehicle: Vehicle) => void;
+  onAdd?: () => void;
 }
 
 export const VehicleTable = ({
@@ -95,6 +96,7 @@ export const VehicleTable = ({
   onDelete,
   onEdit,
   onView,
+  onAdd,
 }: VehicleTableProps) => {
   // État pour le tableau
   const [sorting, setSorting] = useState<SortingState>([
@@ -469,6 +471,7 @@ export const VehicleTable = ({
           <Button 
             className="ml-auto" 
             variant="default"
+            onClick={onAdd}
           >
             <PlusIcon
               className="-ms-1"
