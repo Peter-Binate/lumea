@@ -13,16 +13,16 @@ interface SidebarFormProps {
 
 interface FormData {
   title: string;
-  compartment?: string;
+  registration: string;
   description: string;
 }
 
 const formConfig = {
   title: 'Nouveau véhicule',
-  fields: ['title', 'compartment', 'description'],
+  fields: ['title', 'registration', 'description'],
   labels: {
     title: 'Nom du véhicule',
-    compartment: 'Compartiment',
+    registration: 'Immatriculation',
     description: 'Description',
   },
 };
@@ -31,7 +31,7 @@ export const SideForm = ({ isOpen, onClose, onSubmit }: SidebarFormProps) => {
   // Etat initial du formulaire
   const [formData, setFormData] = useState<FormData>({
     title: '',
-    compartment: '',
+    registration: '',
     description: '',
   });
 
@@ -57,7 +57,7 @@ export const SideForm = ({ isOpen, onClose, onSubmit }: SidebarFormProps) => {
       // Réinitialiser le formulaire après la soumission réussie
       setFormData({
         title: '',
-        compartment: '',
+        registration: '',
         description: '',
       });
     } finally {
@@ -90,8 +90,10 @@ export const SideForm = ({ isOpen, onClose, onSubmit }: SidebarFormProps) => {
           <div className="space-y-6">
             {/* Champ Nom */}
             <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {formConfig.labels.title}
+              </label>
               <Input
-                label={formConfig.labels.title}
                 value={formData.title}
                 onChange={handleChange('title')}
                 required
@@ -112,12 +114,14 @@ export const SideForm = ({ isOpen, onClose, onSubmit }: SidebarFormProps) => {
               />
             </div>
 
-            {/* Champ Compartment  */}
+            {/* Champ immatriculation  */}
             <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {formConfig.labels.registration}
+              </label>
               <Input
-                label={formConfig.labels.compartment}
-                value={formData.compartment}
-                onChange={handleChange('compartment')}
+                value={formData.registration}
+                onChange={handleChange('registration')}
                 required
               />
             </div>

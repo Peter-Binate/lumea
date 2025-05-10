@@ -156,9 +156,9 @@ export const VehicleTable = ({
       enableHiding: true,
     },
     {
-      accessorKey: "rooms",
-      header: "Compartiment",
-      cell: ({ row }) => <div>{row.getValue("rooms")}</div>,
+      accessorKey: "registration",
+      header: "Plaque d'Immatriculation",
+      cell: ({ row }) => <div>{row.getValue("registration")}</div>,
       enableHiding: true,
     },
     {

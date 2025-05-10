@@ -1,14 +1,13 @@
 import { httpClient } from '@/services/api/httpClient';
-import { Compartment } from '@/types/tour';
 import { type } from 'os';
 
 export interface Vehicle {
   id: string;
   title: string;
   description: string;
+  registration: string;
   created_at: Date;
   status: 'pending' | 'completed' | 'cancelled';
-  room?: Compartment[];
   //compartment?: string;
 }
 

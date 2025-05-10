@@ -5,7 +5,7 @@ import { useCompartment } from '@/lib/hooks/useCompartment';
 import { X } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from './Button_old';
-import Input from './Input_old';
+import { Input } from './Input';
 
 interface CompartmentFormProps {
   isOpen: boolean;
