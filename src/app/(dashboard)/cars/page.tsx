@@ -14,6 +14,7 @@ const MOCK_VEHICLES: Vehicle[] = [
     id: '1',
     title: 'Citroën C3',
     description: 'Véhicule compact urbain',
+    registration: 'FN709QM',
     created_at: new Date('2023-05-15'),
     status: 'pending',
   },
@@ -21,6 +22,7 @@ const MOCK_VEHICLES: Vehicle[] = [
     id: '2',
     title: 'Peugeot 3008',
     description: 'SUV familial',
+    registration: 'FN709QM',
     created_at: new Date('2023-08-22'),
     status: 'pending',
   },
@@ -28,6 +30,7 @@ const MOCK_VEHICLES: Vehicle[] = [
     id: '3',
     title: 'Renault Clio',
     description: 'Citadine économique',
+    registration: 'FN709QM',
     created_at: new Date('2024-01-10'),
     status: 'pending',
   },
@@ -35,6 +38,7 @@ const MOCK_VEHICLES: Vehicle[] = [
     id: '4',
     title: 'Tesla Model 3',
     description: 'Véhicule électrique',
+    registration: 'FN709QM',
     created_at: new Date('2024-03-05'),
     status: 'pending',
   }
@@ -74,6 +78,7 @@ export default function VehiclesPage() {
         id: `mock-${Date.now()}`,
         title: data.title || 'Nouveau véhicule',
         description: data.description || 'Description par défaut',
+        registration: data.registration || 'FN709QM',
         created_at: new Date(),
         status: data.status || 'pending'
       };
