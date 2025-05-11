@@ -9,7 +9,7 @@ import { ReactNode } from 'react';
 
 interface TourTableProps {
   data: Tour[];
-  onDelete?: (id: string) => Promise<void>;
+  onDelete?: (id: string) => void;
   onEdit?: (tour: Tour) => void;
   onView?: (tour: Tour) => void;
 }

@@ -25,12 +25,12 @@ export const ToursPage = () => {
     isDeleteModalOpen,
     handleDeleteClick,
     handleConfirmDelete,
-    closeDeleteModal
+    closeDeleteModal,
   } = useDelete(deleteTour, {
     onDeleteSuccess: () => {
       // Fermer le panneau d'information si ouvert
       setIsInfoOpen(false);
-    }
+    },
   });
 
   // Gestionnaire pour l'affichage des informations
@@ -56,7 +56,7 @@ export const ToursPage = () => {
             className="w-full"
             onClick={() => router.push('/tours/add-tour')}
           >
-            <Plus className="mr-2" />
+            <Plus />
             {DASHBOARD_HEADERS_CONFIG.tours.buttonLabel}
           </Button>
         </div>

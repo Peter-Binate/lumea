@@ -1,7 +1,7 @@
 'use client';
 
-import { EmptyState } from '@/app/components/ui/EmptyState';
-import { TourTable } from '@/app/components/ui/Table/TourTable';
+import { EmptyState } from '@/app/components/ui/empty-state';
+import { TourTable } from '@/app/components/ui/Table/tour-table';
 import {
   DASHBOARD_HEADERS_CONFIG,
   ToursDashboardProps,
@@ -14,11 +14,11 @@ export default function TourDashboardTemplate(props: ToursDashboardProps) {
 
   const content =
     data.length === 0 ? (
-      <EmptyState />
+      <EmptyState type="tour" />
     ) : (
       <TourTable
         data={data}
-        onView={onView} // Assurez-vous de passer ces props
+        onView={onView}
         onEdit={onEdit}
         onDelete={onDelete}
       />

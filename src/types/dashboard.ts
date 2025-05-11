@@ -69,7 +69,7 @@ export const DASHBOARD_HEADERS_CONFIG = {
   vehicle: {
     title: 'Vos véhicules',
     description: 'Gérez vos véhicules',
-    buttonLabel: 'Nouveau véhicule',
+    buttonLabel: 'Créer un nouveau véhicule',
   },
   tours: {
     title: 'Vos visites',

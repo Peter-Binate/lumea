@@ -77,7 +77,6 @@ import {
   Eye,
   FilterIcon,
   ListFilterIcon,
-  PlusIcon,
   Trash2,
   TrashIcon
 } from "lucide-react";
@@ -467,20 +466,6 @@ export const VehicleTable = ({
               </AlertDialogContent>
             </AlertDialog>
           )}
-          {/* Add user button */}
-          <Button 
-            className="ml-auto" 
-            variant="default"
-            onClick={onAdd}
-          >
-            <PlusIcon
-              className="-ms-1"
-              size={16}
-              color='#ffffff'
-              aria-hidden="true"
-            />
-            Créer un nouveau véhicule
-          </Button>
         </div>
       </div>
 
