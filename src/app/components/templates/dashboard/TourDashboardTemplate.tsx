@@ -9,12 +9,12 @@ import {
 import BaseDashboardTemplate from './BaseDashboardTemplate';
 
 export default function TourDashboardTemplate(props: ToursDashboardProps) {
-  const { data, onView, onEdit, onDelete, children } = props;
+  const { data, onView, onEdit, onDelete, onAdd, children } = props;
   const header = DASHBOARD_HEADERS_CONFIG.vehicle;
 
   const content =
     data.length === 0 ? (
-      <EmptyState type="tour" />
+      <EmptyState type="tour" onAdd={onAdd} />
     ) : (
       <TourTable
         data={data}

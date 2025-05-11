@@ -49,6 +49,7 @@ export const ToursPage = () => {
         data={tours}
         onDelete={handleDeleteClick}
         onView={handleViewTour}
+        onAdd={() => router.push('/tours/add-tour')}
       >
         {/* En-tête avec bouton d'ajout */}
         <div className="mt-6 md:mt-0">

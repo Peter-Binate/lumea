@@ -24,6 +24,7 @@ export interface ToursDashboardProps extends BaseDashboardProps {
   onDelete: (id: string) => void;
   onEdit?: (tour: Tour) => void;
   onView?: (tour: Tour) => void;
+  onAdd?: () => void;
 }
 
 // Configuration des colonnes pour les tableaux

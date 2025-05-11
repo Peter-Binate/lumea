@@ -14,7 +14,7 @@ export default function VehicleDashboardTemplate(props: VehicleDashboardProps) {
 
   const content =
     data.length === 0 ? (
-      <EmptyState type="vehicle" onAction={onAdd} />
+      <EmptyState type="vehicle" onAdd={onAdd} />
     ) : (
       <VehicleTable
         data={data}

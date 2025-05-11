@@ -1,8 +1,7 @@
-// src/app/auth/login/page.tsx
 'use client';
 
 // Imports des dépendances nécessaires
-import { Input } from '@/app/components/ui/Input';
+import { FormInput } from '@/app/components/ui/form-input';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { loginSchema, type LoginFormData } from '@/utils/validation/schemas';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -26,7 +25,7 @@ export default function LoginPage() {
   useEffect(() => {
     if (isAuthenticated && !isRedirecting) {
       setIsRedirecting(true);
-      router.push('/dashboard');
+      router.push('/cars');
     }
   }, [isAuthenticated, router, isRedirecting]);
 
@@ -124,7 +123,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-          {/* Affichage des erreurs globales */}
+        {/* Affichage des erreurs globales */}
         {globalError && (
           <div
             className="bg-red-50 border-l-4 border-red-500 p-4 mb-6"
@@ -135,12 +134,12 @@ export default function LoginPage() {
         )}
 
         {/* Formulaire de connexion */}
-        <form 
-          onSubmit={handleSubmit(onSubmit)} 
+        <form
+          onSubmit={handleSubmit(onSubmit)}
           className="space-y-4 sm:space-y-6 mt-6 md:mt-8 w-full"
         >
           {/* Champ email avec validation */}
-          <Input
+          <FormInput
             {...register('email')}
             type="email"
             label="Email"

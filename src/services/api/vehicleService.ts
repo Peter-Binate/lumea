@@ -11,6 +11,8 @@ export interface Vehicle {
   //compartment?: string;
 }
 
+// Configuration des statuts
+
 export const vehicleService = {
   // Récupération des propriétés selon le type
   async getAllVehicles(): Promise<Vehicle[]> {
