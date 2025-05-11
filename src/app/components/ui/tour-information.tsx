@@ -93,7 +93,7 @@ export const TourInformation = ({
   return (
     <SideInformation isOpen={isOpen} onClose={onClose} footer={footer}>
       {/* Title and Status */}
-      <div className="flex flex-col items-center justify-center pt-3.5 pb-4 bg-slate-50 border-slate-100 w-11/12 mx-auto rounded-md">
+      <div className="flex flex-col items-center justify-center pt-3.5 pb-4 bg-slate-50 border-slate-100 w-11/12 mx-auto rounded-md shadow-sm">
         <h1 className="text-lg capitalize font-medium text-center text-[#344054] mb-2">
           {tour.title}
         </h1>
@@ -103,14 +103,16 @@ export const TourInformation = ({
       </div>
 
       {/* Property Info */}
-      <div className="my-5 px-2.5 py-4 bg-slate-50 border-slate-100 w-11/12 mx-auto rounded-md">
+      <div className="my-5 px-2.5 py-4 bg-slate-50 border-slate-100 w-11/12 mx-auto rounded-lg shadow-sm">
         <div className="flex items-start mb-4">
-          <div className="bg-blue-100 p-2 rounded-md mr-3">
+          <div className="bg-blue-100 p-2 rounded-lg mr-3">
             <CarFront className="h-5 w-5 text-blue-600" />
           </div>
           <div className="flex-1">
             <p className="text-xs text-gray-500">Véhicule relié</p>
-            <p className="font-medium capitalize">{getVehicleTitle(tour.vehicle)}</p>
+            <p className="font-medium capitalize">
+              {getVehicleTitle(tour.vehicle)}
+            </p>
           </div>
           <div className="text-[10px] text-slate-400 self-start mt-1">
             {formattedDate}
@@ -127,15 +129,15 @@ export const TourInformation = ({
       </div>
 
       {/* Description */}
-      <div className="px-2.5 py-4 bg-slate-50 border-slate-100 w-11/12 mx-auto rounded-md">
-        <h3 className="text-lg font-medium mb-2">Description</h3>
+      <div className="px-2.5 py-4 bg-slate-50 border-slate-100 w-11/12 mx-auto rounded-lg shadow-sm">
+        <h3 className="text-md font-medium mb-2">Description</h3>
         <p className="text-sm text-gray-600">{tour.description}</p>
       </div>
 
       {/* Video Preview */}
       {tour.video && (
         <div className="p-6">
-          <div className="relative bg-[#F8FAFC] h-48 rounded-md overflow-hidden flex items-center justify-center">
+          <div className="relative bg-[#F8FAFC] h-48 rounded-md overflow-hidden flex items-center justify-center shadow-sm">
             <div className="w-full h-full bg-center">
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="bg-blue-600 rounded-full p-2">
