@@ -1,5 +1,5 @@
 import { useAuth } from '@/app/contexts/AuthContext';
-import { useToast } from '@/lib/hooks/useToast';
+import { useToast } from '@/lib/hooks/use-toast';
 import {
   Compartment,
   CompartmentInput,

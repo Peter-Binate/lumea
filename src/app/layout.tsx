@@ -1,6 +1,7 @@
 import { AuthProvider } from '@/app/contexts/AuthContext';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { Toaster } from 'sonner';
 import LayoutWrapper from './components/layouts/LayoutWrapper';
 import PrimaryLayout from './components/layouts/primary/PrimaryLayout';
 import './globals.css';
@@ -28,7 +29,10 @@ export default function RootLayout({
       >
         <AuthProvider>
           <PrimaryLayout>
-            <LayoutWrapper>{children}</LayoutWrapper>
+            <LayoutWrapper>
+              {children}
+              <Toaster position="top-right" closeButton richColors />
+            </LayoutWrapper>
           </PrimaryLayout>
         </AuthProvider>
       </body>

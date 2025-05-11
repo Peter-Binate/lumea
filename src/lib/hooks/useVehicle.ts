@@ -1,6 +1,7 @@
 import { useAuth } from '@/app/contexts/AuthContext';
-import { useToast } from '@/lib/hooks/useToast';
+import { useToast } from '@/lib/hooks/use-toast';
 import { Vehicle, vehicleService } from '@/services/api/vehicleService';
+import { useNotificationService } from '@/services/notification-service';
 import { useEffect, useState } from 'react';
 
 export function useVehicle() {
@@ -8,7 +9,9 @@ export function useVehicle() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { isAuthenticated } = useAuth();
+
   const { toast } = useToast();
+  const notifications = useNotificationService();
 
   const loadVehicle = async () => {
     try {
@@ -38,19 +41,11 @@ export function useVehicle() {
   const createVehicle = async (data: Partial<Vehicle>) => {
     try {
       await vehicleService.createVehicle(data);
-      toast({
-        title: 'Succès',
-        description: 'Propriété créée avec succès',
-        type: 'success',
-      });
+      notifications.vehicleCreated();
       await loadVehicle();
       return true;
     } catch (error) {
-      toast({
-        title: 'Erreur',
-        description: 'Impossible de créer la propriété',
-        type: 'error',
-      });
+      notifications.showError('Impossible de créer le véhicule');
       return false;
     }
   };
@@ -78,19 +73,11 @@ export function useVehicle() {
   const deleteVehicle = async (id: string) => {
     try {
       await vehicleService.deleteVehicle(id);
-      toast({
-        title: 'Succès',
-        description: 'Propriété supprimée avec succès',
-        type: 'success',
-      });
+      notifications.vehicleDeleted();
       await loadVehicle();
       return true;
     } catch (err) {
-      toast({
-        title: 'Erreur',
-        description: 'Impossible de supprimer la propriété',
-        type: 'error',
-      });
+      notifications.showError('Impossible de supprimer le véhicule');
       return false;
     }
   };
