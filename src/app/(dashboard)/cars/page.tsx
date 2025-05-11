@@ -3,7 +3,7 @@
 import { SideForm } from '@/app/components/forms/SideForm';
 import VehicleDashboardTemplate from '@/app/components/templates/dashboard/VehicleDashboardTemplate';
 import { DeleteConfirmationModal } from '@/app/components/ui/delete-confirmation-modal';
-import { VehicleInformation } from '@/app/components/ui/VehicleInformation';
+import { VehicleInformation } from '@/app/components/ui/vehicle-information';
 import { useVehicle } from '@/lib/hooks/useVehicle';
 import { Vehicle } from '@/services/api/vehicleService';
 import { useState } from 'react';

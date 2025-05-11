@@ -21,5 +21,5 @@ export type TourFormData = {
   description: string;
   vehicle: string;
   view: TourViewChoiceType;
-  file: File | null;
+  file?: File;
 };

@@ -1,6 +1,7 @@
 import ky from 'ky';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+//const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE_URL = process.env.NEXT_LOCAL_API_URL || 'http://localhost:8000';
 
 interface ErrorResponse {
   message?: string;
@@ -35,7 +36,7 @@ export const httpClient = ky.create({
     ],
     afterResponse: [
       // Gestion des erreurs http
-      async (request, options, response) => {
+      async (request, _options, response) => {
         // Log de la réponse
         console.log('Réponse du serveur:', {
           status: response.status,

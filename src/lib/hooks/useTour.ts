@@ -1,6 +1,10 @@
 import { useAuth } from '@/app/contexts/AuthContext';
 import { useToast } from '@/lib/hooks/useToast';
-import { Tour, tourService } from '@/services/api/tourService';
+import {
+  Tour,
+  TourServiceError,
+  tourService,
+} from '@/services/api/tourService';
 import { useEffect, useState } from 'react';
 
 export function useTour() {
@@ -13,13 +17,8 @@ export function useTour() {
   const loadTours = async () => {
     try {
       setIsLoading(true);
-      setError(null);
-
-      if (!isAuthenticated) {
-        throw new Error('Utilisateur non authentifié');
-      }
-
       const data = await tourService.getTours();
+      console.log('Tours chargés:', data);
       setTours(data);
     } catch (error) {
       console.error('Erreur lors du chargement des tours:', error);
@@ -29,23 +28,26 @@ export function useTour() {
     }
   };
 
-  const createTour = async (data: Partial<Tour>) => {
+  const createTour = async (
+    tourData: any
+  ): Promise<{ success: boolean; error?: string }> => {
     try {
-      await tourService.createTour(data);
-      toast({
-        title: 'Succès',
-        description: 'Tour créé avec succès',
-        type: 'success',
-      });
-      await loadTours();
-      return true;
+      await tourService.createTour(tourData);
+      return { success: true };
     } catch (error) {
-      toast({
-        title: 'Erreur',
-        description: 'Impossible de créer la tour',
-        type: 'error',
-      });
-      return false;
+      console.error('Erreur lors de la création du tour:', error);
+      let errorMessage = 'Une erreur est survenue lors de la création du tour.';
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (error instanceof TourServiceError) {
+        errorMessage = error.message;
+      }
+
+      return {
+        success: false,
+        error: errorMessage,
+      };
     }
   };
 

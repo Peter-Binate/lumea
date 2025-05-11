@@ -1,8 +1,8 @@
 'use client';
 
-import { Button } from '@/app/components/ui/Button_old';
+import { Button } from '@/app/components/ui/button';
 import { PageTitle } from '@/app/components/ui/PageTitle';
-import { TourInformation } from '@/app/components/ui/TourInformation';
+import { TourInformation } from '@/app/components/ui/tour-information';
 import { useTour } from '@/lib/hooks/useTour';
 import { Tour } from '@/services/api/tourService';
 import { DASHBOARD_HEADERS_CONFIG } from '@/types/dashboard';

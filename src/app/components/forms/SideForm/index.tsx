@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/app/components/ui/Button_old';
+import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/Input';
 import { X } from 'lucide-react';
 import { useState } from 'react';

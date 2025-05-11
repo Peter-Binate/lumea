@@ -4,7 +4,7 @@ import { Vehicle } from '@/services/api/vehicleService';
 import { X } from 'lucide-react';
 import { useState } from 'react';
 // import { toast } from 'sonner';
-import { Button } from './Button_old';
+import { Button } from '@/app/components/ui/button';
 
 interface VehicleInformationProps {
   isOpen: boolean;
@@ -48,8 +48,7 @@ export const VehicleInformation = ({
           {/* Titre */}
           <div>
             <h3 className="text-lg font-medium text-gray-900">
-              {/* {vehicle.title} */}
-              Peugot 307
+              {vehicle.title}
             </h3>
           </div>
 
@@ -59,26 +58,7 @@ export const VehicleInformation = ({
               Description
             </h4>
             <p className="text-sm text-gray-600">
-              {/* {vehicle.description} */}
-              Lorem, ipsum dolor sit amet consectetur adipisicing elit. In
-              consectetur suscipit ducimus cupiditate rem aliquam esse dolorum!
-              Quam, accusamus enim dolor fugit tempore facilis, quas vero at
-              ipsam velit molestiae? Assumenda soluta a in dolore, architecto,
-              tempora blanditiis adipisci dignissimos odio totam exercitationem
-              nostrum debitis, fugiat voluptatibus explicabo. Voluptate ipsam
-              asperiores laboriosam praesentium temporibus quibusdam eos neque
-              est maiores omnis! Enim nam ex nesciunt alias odit voluptatem
-              laborum ducimus pariatur quisquam. Accusantium at sit similique a
-              consectetur, iste perferendis placeat nobis minus reiciendis
-              aliquid! Hic voluptatum recusandae beatae. Commodi, numquam.
-              Deleniti placeat ut reprehenderit! Dolorum quos porro aspernatur
-              minima repellendus sed ipsam quas natus totam dolor aliquid
-              dignissimos quo adipisci nulla voluptate numquam recusandae odit,
-              ut magni animi? Inventore, ullam. Sunt consequuntur totam
-              doloribus magni iusto quam temporibus eligendi mollitia ratione
-              nesciunt doloremque placeat sapiente tempora, aperiam natus sed
-              dicta accusantium autem? Rem harum aliquid possimus totam sunt
-              excepturi exercitationem.
+              {vehicle.description}
             </p>
           </div>
         </div>
@@ -88,8 +68,8 @@ export const VehicleInformation = ({
           <div className="flex gap-4">
             {onDelete && (
               <Button
-                variant="outline"
-                className="flex-1 text-red-600 hover:text-red-700"
+                variant="destructive"
+                className="flex-1"
                 onClick={() => onDelete(vehicle.id)}
                 disabled={isDeleting || isUpdating}
               >

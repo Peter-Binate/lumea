@@ -1,4 +1,3 @@
-import { Compartment } from '@/types/tour';
 import { httpClient } from './httpClient';
 
 // Types des status possibles pour une visite
@@ -21,9 +20,9 @@ export type TourStatus = Exclude<
 export interface TourCreateInput {
   title: string;
   description: string;
-  vehicle: string;  // ID du véhicule
-  view: number;     // Type de vue (entier)
-  file: string;     // Base64 du fichier
+  vehicle: string; // ID du véhicule
+  view: number; // Type de vue (entier)
+  file: string; // Base64 du fichier
 }
 
 // Interface pour la structure d'une visite
@@ -34,11 +33,10 @@ export interface Tour {
   status: TourStatus;
   created_at: string;
   updated_at: string;
-  car?: {
+  vehicle?: string | {
     id: string;
     title: string;
   };
-  compartment?: Compartment[];
   video?: string;
 }
 
@@ -81,7 +79,37 @@ export const tourService = {
 
       const toursData = await response.json<Tour[]>();
       console.log('Tours récupérés:', toursData);
-      return toursData;
+
+      // Récupérer les informations complètes des véhicules pour chaque tour
+      const toursWithVehicles = await Promise.all(
+        toursData.map(async (tour) => {
+          if (tour.vehicle && typeof tour.vehicle === 'string') {
+            try {
+              const vehicleResponse = await httpClient.get(
+                `tour/vehicle/${tour.vehicle}`
+              );
+              if (vehicleResponse.ok) {
+                const vehicleData = (await vehicleResponse.json()) as {
+                  id: string;
+                  title: string;
+                };
+                tour.vehicle = {
+                  id: vehicleData.id,
+                  title: vehicleData.title,
+                };
+              }
+            } catch (error) {
+              console.error(
+                `Erreur lors de la récupération du véhicule ${tour.vehicle}:`,
+                error
+              );
+            }
+          }
+          return tour;
+        })
+      );
+
+      return toursWithVehicles;
     } catch (error) {
       console.error('Erreur lors de la récupération des tours:', error);
       throw error instanceof TourServiceError
@@ -101,7 +129,26 @@ export const tourService = {
         throw new TourServiceError('Tour non trouvée', response.status);
       }
 
-      return await response.json();
+      const tour = (await response.json()) as Tour;
+
+      // Si le véhicule n'est qu'un ID, récupérer ses informations complètes
+      if (tour.vehicle && typeof tour.vehicle === 'string') {
+        const vehicleResponse = await httpClient.get(
+          `tour/vehicle/${tour.vehicle}`
+        );
+        if (vehicleResponse.ok) {
+          const vehicleData = (await vehicleResponse.json()) as {
+            id: string;
+            title: string;
+          };
+          tour.vehicle = {
+            id: vehicleData.id,
+            title: vehicleData.title,
+          };
+        }
+      }
+
+      return tour;
     } catch (error) {
       console.error(
         `Erreur lors de la récupération de la visite ${id}:`,
@@ -175,7 +222,7 @@ export const tourService = {
   // Suppression d'un tour avec meilleure gestion des erreurs
   async deleteTour(id: string): Promise<boolean> {
     try {
-      const response = await httpClient.delete(`tours/${id}/`, {
+      const response = await httpClient.delete(`tour/tour/${id}/`, {
         throwHttpErrors: false,
       });
 

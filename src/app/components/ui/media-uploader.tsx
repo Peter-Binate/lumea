@@ -18,6 +18,7 @@ type FileWithPreview = {
 type MediaUploaderProps = {
   onFilesUpdated: (files: File[]) => void;
   maxFiles: number;
+  acceptedFileTypes?: string[];
 };
 
 export const MediaUploader = ({
@@ -31,13 +32,18 @@ export const MediaUploader = ({
   // Mise à jour du nombre de fichiers uploadés
   useEffect(() => {
     const count = files.filter((f) => f.uploaded).length;
-    setUploadedCount(count);
 
-    // Notifier le composant parent des fichiers uploadés
+    // Ne mettre à jour que si le nombre a changé
+    if (count !== uploadedCount) {
+      setUploadedCount(count);
+    }
+
+    // Notifier le composant parent uniquement si des fichiers sont uploadés
     const uploadedFiles = files.filter((f) => f.uploaded).map((f) => f.file);
-
-    onFilesUpdated(uploadedFiles);
-  }, [files, onFilesUpdated]);
+    if (uploadedFiles.length > 0) {
+      onFilesUpdated(uploadedFiles);
+    }
+  }, [files, onFilesUpdated, uploadedCount]);
 
   // Simulation d'upload de fichier
   const uploadFile = useCallback((fileItem: FileWithPreview) => {
@@ -90,8 +96,9 @@ export const MediaUploader = ({
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      'image/jpeg': ['.jpg', '.jpeg'],
-      'image/png': ['.png'],
+      'video/mp4': ['.mp4'],
+      'video/quicktime': ['.mov'],
+      'video/webm': ['.webm'],
     },
     multiple: true,
     disabled: isLimitReached,
@@ -150,14 +157,15 @@ export const MediaUploader = ({
               <Upload className="h-8 w-8 text-muted-foreground" />
               <h3 className="text-base font-medium">
                 {isDragActive
-                  ? 'Déposez vos photos ici'
-                  : 'Glissez & déposez des photos ici'}
+                  ? 'Déposez votre vidéo ici'
+                  : 'Glissez & déposez votre vidéo ici'}
               </h3>
               <p className="text-sm text-muted-foreground">
-                ou cliquez pour parcourir (JPG, JPEG, PNG)
+                ou cliquez pour parcourir (MP4, MOV, WEBM){' '}
+                <span className="text-red-500">*</span>
               </p>
               <p className="text-sm font-medium mt-1">
-                {uploadedCount} sur {maxFiles} photos téléchargées
+                {uploadedCount} sur {maxFiles} vidéo téléchargée
               </p>
             </div>
           </div>
