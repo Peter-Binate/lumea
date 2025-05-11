@@ -26,7 +26,7 @@ export const SideInformation = ({
       } z-50`}
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b">
+      <div className="flex items-center justify-between p-4">
         <h2 className="font-medium">{title}</h2>
         <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
           <X className="h-5 w-5" />

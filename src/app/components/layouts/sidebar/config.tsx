@@ -15,9 +15,9 @@ export const NavItems = () => {
     // Liens de navigation principaux
     {
       name: 'Dashboard',
-      href: '/',
+      href: '/dashboard',
       icon: <House size={20} />,
-      active: pathname === '/',
+      active: pathname === '/dashboard',
       position: 'top',
     },
     {

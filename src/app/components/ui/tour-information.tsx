@@ -93,8 +93,8 @@ export const TourInformation = ({
   return (
     <SideInformation isOpen={isOpen} onClose={onClose} footer={footer}>
       {/* Title and Status */}
-      <div className="flex flex-col items-center justify-center pt-6 pb-4">
-        <h1 className="text-[18px] font-medium text-center text-gray-800 mb-2">
+      <div className="flex flex-col items-center justify-center pt-3.5 pb-4 bg-slate-50 border-slate-100 w-11/12 mx-auto rounded-md">
+        <h1 className="text-lg capitalize font-medium text-center text-[#344054] mb-2">
           {tour.title}
         </h1>
         <Badge variant="secondary" className={statusDisplay.className}>
@@ -103,23 +103,23 @@ export const TourInformation = ({
       </div>
 
       {/* Property Info */}
-      <div className="px-6 py-4 border-b">
+      <div className="my-5 px-2.5 py-4 bg-slate-50 border-slate-100 w-11/12 mx-auto rounded-md">
         <div className="flex items-start mb-4">
           <div className="bg-blue-100 p-2 rounded-md mr-3">
             <CarFront className="h-5 w-5 text-blue-600" />
           </div>
           <div className="flex-1">
-            <p className="text-sm text-gray-500">Véhicule relié</p>
-            <p className="font-medium">{getVehicleTitle(tour.vehicle)}</p>
+            <p className="text-xs text-gray-500">Véhicule relié</p>
+            <p className="font-medium capitalize">{getVehicleTitle(tour.vehicle)}</p>
           </div>
-          <div className="text-xs text-gray-500 self-start mt-1">
+          <div className="text-[10px] text-slate-400 self-start mt-1">
             {formattedDate}
           </div>
         </div>
 
         <Button
           variant="outline"
-          className="w-full flex items-center justify-center gap-2 text-blue-600 border-blue-200"
+          className="w-full flex items-center justify-center gap-2 text-sm text-indigo-950"
           onClick={handleVehicleClick}
         >
           Accéder à la location <ExternalLink className="h-4 w-4" />
@@ -127,8 +127,8 @@ export const TourInformation = ({
       </div>
 
       {/* Description */}
-      <div className="px-6 py-4 border-b">
-        <h3 className="font-medium mb-2">Description</h3>
+      <div className="px-2.5 py-4 bg-slate-50 border-slate-100 w-11/12 mx-auto rounded-md">
+        <h3 className="text-lg font-medium mb-2">Description</h3>
         <p className="text-sm text-gray-600">{tour.description}</p>
       </div>
 

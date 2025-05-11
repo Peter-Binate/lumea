@@ -5,16 +5,14 @@ export const metadata: Metadata = {
   description: 'Tableau dee bord Lumea',
 };
 
-export default function PortfolioLayout({
+export default function CarsLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
     <div className="min-h-screen">
-      <div className="mx-auto w-full max-w-6xl">
-        {children}
-      </div>
+      <div className="mx-auto w-full max-w-6xl">{children}</div>
     </div>
   );
 }

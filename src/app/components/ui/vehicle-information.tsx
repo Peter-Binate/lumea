@@ -60,6 +60,16 @@ export const VehicleInformation = ({
           {vehicle.description}
         </p>
       </div>
+
+      {/* Registration */}
+      <div className="p-6">
+        <h4 className="text-sm font-medium text-gray-900 mb-2">
+          Plaque d'Immatriculation
+        </h4>
+        <p className="text-sm text-gray-600">
+          {vehicle.registration}
+        </p>
+      </div>
     </SideInformation>
   );
 };
