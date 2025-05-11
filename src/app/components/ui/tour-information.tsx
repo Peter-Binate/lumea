@@ -1,3 +1,5 @@
+'use client';
+
 import { Badge } from '@/app/components/ui/badge';
 import { Button } from '@/app/components/ui/button';
 import { SideInformation } from '@/app/components/ui/side-information';
@@ -5,6 +7,7 @@ import { Tour } from '@/services/api/tourService';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { CarFront, ExternalLink, Play } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface TourInformationProps {
   isOpen: boolean;
@@ -29,10 +32,9 @@ export const TourInformation = ({
   tour,
   onDelete,
 }: TourInformationProps) => {
-  console.log('TourInformation rendu, isOpen =', isOpen, 'tour =', tour);
-  if (!tour || !isOpen) return null;
+  const router = useRouter();
 
-  console.log('Structure de tour.vehicle:', tour.vehicle);
+  if (!tour || !isOpen) return null;
 
   const statusDisplay = statusConfig[tour.status] || {
     text: 'Inconnu',
@@ -51,6 +53,21 @@ export const TourInformation = ({
     if (!vehicle) return 'Non défini';
     if (typeof vehicle === 'object' && 'title' in vehicle) return vehicle.title;
     return 'Non défini';
+  };
+
+  const getVehicleId = (vehicle: Tour['vehicle']): string | null => {
+    if (!vehicle) return null;
+    if (typeof vehicle === 'object' && 'id' in vehicle) return vehicle.id;
+    if (typeof vehicle === 'string') return vehicle;
+    return null;
+  };
+
+  const handleVehicleClick = () => {
+    const vehicleId = getVehicleId(tour.vehicle);
+    if (vehicleId) {
+      // Redirection vers la page des véhicules avec le paramètre pour ouvrir le panneau
+      router.push(`/cars?vehicleId=${vehicleId}`);
+    }
   };
 
   const footer = (
@@ -72,7 +89,7 @@ export const TourInformation = ({
       </Button>
     </div>
   );
-  
+
   return (
     <SideInformation isOpen={isOpen} onClose={onClose} footer={footer}>
       {/* Title and Status */}
@@ -93,9 +110,7 @@ export const TourInformation = ({
           </div>
           <div className="flex-1">
             <p className="text-sm text-gray-500">Véhicule relié</p>
-            <p className="font-medium">
-              {getVehicleTitle(tour.vehicle)}
-            </p>
+            <p className="font-medium">{getVehicleTitle(tour.vehicle)}</p>
           </div>
           <div className="text-xs text-gray-500 self-start mt-1">
             {formattedDate}
@@ -105,13 +120,7 @@ export const TourInformation = ({
         <Button
           variant="outline"
           className="w-full flex items-center justify-center gap-2 text-blue-600 border-blue-200"
-          onClick={() =>
-            console.log(`Accéder au véhicule: ${
-              typeof tour.vehicle === 'object' ? 
-                tour.vehicle.id : 
-                tour.vehicle
-              }`)
-          }
+          onClick={handleVehicleClick}
         >
           Accéder à la location <ExternalLink className="h-4 w-4" />
         </Button>

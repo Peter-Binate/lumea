@@ -7,6 +7,16 @@ export const TOUR_VIEW_CHOICES = {
   OTHER: 4,
 } as const;
 
+// Mapping des types de vue en français
+export const TOUR_VIEW_LABELS: Record<keyof typeof TOUR_VIEW_CHOICES, string> =
+  {
+    OUTSIDE: 'Extérieur',
+    INSIDE: 'Intérieur',
+    MOTOR: 'Moteur',
+    TRUNK: 'Coffre',
+    OTHER: 'Autre',
+  } as const;
+
 export type TourViewChoiceType =
   (typeof TOUR_VIEW_CHOICES)[keyof typeof TOUR_VIEW_CHOICES];
 

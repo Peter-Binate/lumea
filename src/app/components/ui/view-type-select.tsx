@@ -1,6 +1,10 @@
 'use client';
 
-import { TOUR_VIEW_CHOICES, TourViewChoiceType } from '@/types/tour';
+import {
+  TOUR_VIEW_CHOICES,
+  TOUR_VIEW_LABELS,
+  TourViewChoiceType,
+} from '@/types/tour';
 
 type ViewTypeSelectProps = {
   value: TourViewChoiceType;
@@ -9,8 +13,8 @@ type ViewTypeSelectProps = {
 
 export const ViewTypeSelect = ({ value, onChange }: ViewTypeSelectProps) => {
   // Conversion de l'objet TOUR_VIEW_CHOICES en tableau pour l'affichage
-  const viewOptions = Object.entries(TOUR_VIEW_CHOICES).map(([label, value]) => ({
-    label,
+  const viewOptions = Object.entries(TOUR_VIEW_CHOICES).map(([key, value]) => ({
+    label: TOUR_VIEW_LABELS[key as keyof typeof TOUR_VIEW_LABELS],
     value,
   }));
 
@@ -22,8 +26,8 @@ export const ViewTypeSelect = ({ value, onChange }: ViewTypeSelectProps) => {
         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
       >
         {viewOptions.map((option) => (
-          <option key={option.label} value={option.value}>
-            {option.label.toLowerCase().replace('_', ' ')}
+          <option key={option.value} value={option.value}>
+            {option.label}
           </option>
         ))}
       </select>

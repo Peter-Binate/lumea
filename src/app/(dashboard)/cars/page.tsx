@@ -10,10 +10,13 @@ import { useVehicle } from '@/lib/hooks/useVehicle';
 import { Vehicle } from '@/services/api/vehicleService';
 import { DASHBOARD_HEADERS_CONFIG } from '@/types/dashboard';
 import { Plus } from 'lucide-react';
-import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { PageTitle } from '../../components/ui/PageTitle';
 
 export default function VehiclesPage() {
+  const searchParams = useSearchParams();
+  const vehicleId = searchParams.get('vehicleId');
 
   // État local uniquement pour le formulaire
   const [isSideFormOpen, setIsSideFormOpen] = useState(false);
@@ -34,13 +37,24 @@ export default function VehiclesPage() {
     isDeleteModalOpen,
     handleDeleteClick,
     handleConfirmDelete,
-    closeDeleteModal
+    closeDeleteModal,
   } = useDelete(deleteAction, {
     onDeleteSuccess: () => {
       // Fermer le panneau d'information si ouvert
       setIsInfoOpen(false);
-    }
+    },
   });
+
+  // Effet pour ouvrir automatiquement le panneau d'information si un vehicleId est présent dans l'URL
+  useEffect(() => {
+    if (vehicleId && vehicle) {
+      const vehicleToShow = vehicle.find((v) => v.id === vehicleId);
+      if (vehicleToShow) {
+        setSelectedVehicle(vehicleToShow);
+        setIsInfoOpen(true);
+      }
+    }
+  }, [vehicleId, vehicle]);
 
   // Wrapper pour afficher le formulaire de compartiment
   const handleViewVehicle = (vehicle: Vehicle) => {
