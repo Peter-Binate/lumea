@@ -29,27 +29,56 @@ export function useTour() {
   };
 
   const createTour = async (
-    tourData: any
-  ): Promise<{ success: boolean; error?: string }> => {
-    try {
-      await tourService.createTour(tourData);
-      return { success: true };
-    } catch (error) {
-      console.error('Erreur lors de la création du tour:', error);
-      let errorMessage = 'Une erreur est survenue lors de la création du tour.';
-
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      } else if (error instanceof TourServiceError) {
-        errorMessage = error.message;
-      }
-
-      return {
-        success: false,
-        error: errorMessage,
+  tourData: any
+): Promise<{ success: boolean; error?: string }> => {
+  try {
+    // Vérification des données minimales
+    if (!tourData.title || !tourData.vehicle || !tourData.file) {
+      console.error("Données incomplètes:", 
+        JSON.stringify({
+          hasTitle: !!tourData.title,
+          hasVehicle: !!tourData.vehicle,
+          hasFile: !!tourData.file,
+        })
+      );
+      return { 
+        success: false, 
+        error: "Données incomplètes. Veuillez remplir tous les champs obligatoires."
       };
     }
-  };
+    
+    console.log("Tentative de création de tour avec les données:", {
+      title: tourData.title,
+      description: tourData.description?.substring(0, 20) || "N/A",
+      vehicleId: tourData.vehicle,
+      viewType: tourData.view,
+      fileSize: tourData.file ? (tourData.file.length / 1024).toFixed(2) + " KB" : "N/A",
+    });
+    
+    const response = await tourService.createTour(tourData);
+    console.log("Réponse de création:", response);
+    
+    // Recharger les tours après la création
+    await loadTours();
+    
+    return { success: true };
+  } catch (error) {
+    console.error('Erreur détaillée lors de la création du tour:', error);
+    
+    let errorMessage = 'Une erreur est survenue lors de la création du tour.';
+
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    } else if (error instanceof TourServiceError) {
+      errorMessage = `Erreur (${error.statusCode || "inconnu"}): ${error.message}`;
+    }
+
+    return {
+      success: false,
+      error: errorMessage,
+    };
+  }
+};
 
   const updateTour = async (id: string, data: Partial<Tour>) => {
     try {

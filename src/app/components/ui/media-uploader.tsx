@@ -31,27 +31,22 @@ export const MediaUploader = ({
 
   // Mise à jour du nombre de fichiers uploadés
   useEffect(() => {
-    const count = files.filter((f) => f.uploaded).length;
-
-    // Ne mettre à jour que si le nombre a changé
-    if (count !== uploadedCount) {
-      setUploadedCount(count);
-    }
-
-    // Notifier le composant parent uniquement si des fichiers sont uploadés
-    const uploadedFiles = files.filter((f) => f.uploaded).map((f) => f.file);
-    if (uploadedFiles.length > 0) {
-      onFilesUpdated(uploadedFiles);
-    }
-  }, [files, onFilesUpdated, uploadedCount]);
+    const count = files.length;
+    setUploadedCount(count);
+    
+    const currentFiles = files.map((f) => f.file);
+    onFilesUpdated(currentFiles);
+}, [files, onFilesUpdated]);
 
   // Simulation d'upload de fichier
   const uploadFile = useCallback((fileItem: FileWithPreview) => {
     if (fileItem.uploaded) return;
 
+    // Simulation d'upload plus rapide et directe
     let progress = 0;
     const interval = setInterval(() => {
-      progress += 10;
+      progress += 20; // Plus rapide (20% à la fois)
+      
       setFiles((prev) =>
         prev.map((f) => (f.id === fileItem.id ? { ...f, progress } : f))
       );
@@ -62,7 +57,7 @@ export const MediaUploader = ({
           prev.map((f) => (f.id === fileItem.id ? { ...f, uploaded: true } : f))
         );
       }
-    }, 200);
+    }, 100); // Intervalle plus court
   }, []);
 
   // Gestionnaire pour le drag and drop de fichiers

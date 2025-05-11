@@ -4,11 +4,12 @@ import { TourInfoForm } from '@/app/components/forms/TourInfoForm/tour-info-form
 import { Alert, AlertDescription } from '@/app/components/ui/alert';
 import { Button } from '@/app/components/ui/button';
 import { MediaUploader } from '@/app/components/ui/media-uploader';
+import { PageTitle } from '@/app/components/ui/PageTitle';
 import { useTour } from '@/lib/hooks/useTour';
 import { TourFormData } from '@/types/tour';
+import { FileIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
-import { PageTitle } from '../../../components/ui/PageTitle';
 
 const INITIAL_FORM_STATE: TourFormData = {
   title: '',
@@ -30,25 +31,50 @@ export default function AddTourPage() {
 
   const handleFileChange = useCallback(
     (files: File[]) => {
-      updateFormData({ file: files[0] || undefined });
+      if (files && files.length > 0 && files[0] instanceof File) {
+        console.log('Fichier sélectionné:', files[0].name); // Pour débogage
+        updateFormData({ file: files[0] });
+      } else {
+        console.warn('Aucun fichier valide reçu');
+        updateFormData({ file: undefined });
+      }
     },
     [updateFormData]
   );
 
   const validateForm = useCallback((): boolean => {
+    // Réinitialiser toute erreur précédente
+    setFormError(null);
+
+    // Vérification du titre
+    if (!formData.title.trim()) {
+      setFormError('Le titre est obligatoire.');
+      return false;
+    }
+
+    // Vérification du véhicule
+    if (!formData.vehicle) {
+      setFormError('Veuillez sélectionner un véhicule.');
+      return false;
+    }
+
+    // Vérification du fichier
     if (!formData.file) {
       setFormError(
         'Veuillez sélectionner un fichier vidéo avant de soumettre le formulaire.'
       );
       return false;
     }
+
     return true;
-  }, [formData.file]);
+  }, [formData.title, formData.vehicle, formData.file]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setFormError(null);
+
+    console.log('État du formulaire avant validation:', formData);
 
     if (!validateForm()) {
       setIsSubmitting(false);
@@ -56,13 +82,32 @@ export default function AddTourPage() {
     }
 
     try {
+      // S'assurer que le fichier existe avant la conversion
+      if (!formData.file) {
+        throw new Error('Le fichier est manquant');
+      }
+
+      // Convertir le fichier en base64
+      const base64File = await fileToBase64(formData.file);
+      console.log(
+        'Fichier converti en base64',
+        base64File.substring(0, 50) + '...'
+      );
+
       const tourData = {
         title: formData.title,
         description: formData.description,
         vehicle: formData.vehicle,
         view: formData.view,
-        file: await fileToBase64(formData.file!),
+        file: base64File,
       };
+
+      console.log('Données à envoyer:', {
+        ...tourData,
+        file: tourData.file
+          ? `${tourData.file.substring(0, 20)}... (tronqué)`
+          : null,
+      });
 
       const result = await createTour(tourData);
 
@@ -77,7 +122,9 @@ export default function AddTourPage() {
     } catch (error) {
       console.error('Erreur lors de la soumission du formulaire:', error);
       setFormError(
-        "Une erreur inattendue s'est produite lors de la création de la visite. Veuillez réessayer ultérieurement."
+        error instanceof Error
+          ? `Erreur: ${error.message}`
+          : "Une erreur inattendue s'est produite lors de la création de la visite. Veuillez réessayer ultérieurement."
       );
     } finally {
       setIsSubmitting(false);
@@ -85,16 +132,73 @@ export default function AddTourPage() {
   };
 
   const fileToBase64 = async (file: File): Promise<string> => {
+    if (!file || !(file instanceof File)) {
+      throw new Error("L'objet fourni n'est pas un fichier valide");
+    }
+
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        // Extraction de la partie base64 (élimination du préfixe data:...)
-        const base64String = reader.result?.toString().split(',')[1] || '';
-        resolve(base64String);
-      };
-      reader.onerror = (error) => reject(error);
+
+      try {
+        reader.readAsDataURL(file);
+
+        reader.onload = () => {
+          try {
+            if (!reader.result) {
+              reject(new Error('Échec de la lecture du fichier'));
+              return;
+            }
+
+            // Extraction de la partie base64 (élimination du préfixe data:...)
+            const dataUrl = reader.result.toString();
+            const base64 = dataUrl.split(',')[1];
+
+            if (!base64) {
+              reject(
+                new Error(
+                  'Format de fichier invalide pour la conversion en base64'
+                )
+              );
+              return;
+            }
+
+            resolve(base64);
+          } catch (error) {
+            console.error('Erreur lors du traitement du résultat:', error);
+            reject(error);
+          }
+        };
+
+        reader.onerror = (event) => {
+          console.error('Erreur lors de la lecture du fichier:', event);
+          reject(new Error('Erreur lors de la lecture du fichier'));
+        };
+      } catch (error) {
+        console.error(
+          "Exception lors de l'initialisation de la lecture:",
+          error
+        );
+        reject(error);
+      }
     });
+  };
+
+  const renderFilePreview = () => {
+    if (!formData.file) return null;
+
+    return (
+      <div className="mt-4 p-3 bg-blue-50 rounded-md border border-blue-200">
+        <div className="flex items-center">
+          <FileIcon className="h-5 w-5 text-blue-500 mr-2" />
+          <div className="text-sm">
+            <p className="font-medium text-blue-700">{formData.file.name}</p>
+            <p className="text-blue-600 text-xs">
+              {(formData.file.size / 1024 / 1024).toFixed(2)} MB
+            </p>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -126,6 +230,7 @@ export default function AddTourPage() {
                 maxFiles={1}
                 acceptedFileTypes={['.mp4', '.mov', '.webm']}
               />
+              {formData.file && renderFilePreview()}
             </div>
           </div>
         </div>
