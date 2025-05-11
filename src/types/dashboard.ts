@@ -21,7 +21,7 @@ export interface VehicleDashboardProps extends BaseDashboardProps {
 // Props spécifiques au template Tours
 export interface ToursDashboardProps extends BaseDashboardProps {
   data: Tour[];
-  onDelete: (id: string) => Promise<void>;
+  onDelete: (id: string) => void;
   onEdit?: (tour: Tour) => void;
   onView?: (tour: Tour) => void;
 }

@@ -16,7 +16,7 @@ import { useState } from 'react';
 interface DeleteConfirmationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => Promise<void>;
+  onConfirm: () => void;
   actionName: string;
 }
 

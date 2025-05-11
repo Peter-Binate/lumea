@@ -4,6 +4,7 @@ import { SideForm } from '@/app/components/forms/SideForm';
 import VehicleDashboardTemplate from '@/app/components/templates/dashboard/VehicleDashboardTemplate';
 import { DeleteConfirmationModal } from '@/app/components/ui/delete-confirmation-modal';
 import { VehicleInformation } from '@/app/components/ui/vehicle-information';
+import { useDelete } from '@/lib/hooks/use-delete';
 import { useVehicle } from '@/lib/hooks/useVehicle';
 import { Vehicle } from '@/services/api/vehicleService';
 import { useState } from 'react';
@@ -15,7 +16,6 @@ export default function VehiclesPage() {
   const [isSideFormOpen, setIsSideFormOpen] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | undefined>();
   const [isInfoOpen, setIsInfoOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [vehicleToDelete, setVehicleToDelete] = useState<string | null>(null);
 
   // Utilisation du hook pour toute la logique des Vehicless
@@ -27,6 +27,18 @@ export default function VehiclesPage() {
     deleteVehicle: deleteAction,
   } = useVehicle();
 
+  const {
+    isDeleteModalOpen,
+    handleDeleteClick,
+    handleConfirmDelete,
+    closeDeleteModal
+  } = useDelete(deleteAction, {
+    onDeleteSuccess: () => {
+      // Fermer le panneau d'information si ouvert
+      setIsInfoOpen(false);
+    }
+  });
+
   // Wrapper pour afficher le formulaire de compartiment
   const handleViewVehicle = (vehicle: Vehicle) => {
     setSelectedVehicle(vehicle);
@@ -36,24 +48,8 @@ export default function VehiclesPage() {
   // Gestionnaire pour la création
   const handleCreateVehicles = async (data: Partial<Vehicle>) => {
     const success = await createVehicle(data);
-    // const success = await createVehicle(data);
     if (success) {
       setIsSideFormOpen(false);
-    }
-  };
-
-  // Afficher la modale de confirmation avant supression
-  const handleDeleteClick = (id: string) => {
-    setVehicleToDelete(id);
-    setIsDeleteModalOpen(true);
-  };
-
-  // Execution de la supression après confirmation
-  const handleConfirmDelete = async () => {
-    if (vehicleToDelete) {
-      await deleteAction(vehicleToDelete);
-      setVehicleToDelete(null);
-      setIsInfoOpen(false);
     }
   };
 
@@ -87,7 +83,7 @@ export default function VehiclesPage() {
       {/* Modale de confirmation de suppression */}
       <DeleteConfirmationModal
         isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
+        onClose={closeDeleteModal}
         onConfirm={handleConfirmDelete}
         actionName="supprimer ce véhicule"
       />

@@ -1,8 +1,10 @@
 'use client';
 
 import { Button } from '@/app/components/ui/button';
+import { DeleteConfirmationModal } from '@/app/components/ui/delete-confirmation-modal';
 import { PageTitle } from '@/app/components/ui/PageTitle';
 import { TourInformation } from '@/app/components/ui/tour-information';
+import { useDelete } from '@/lib/hooks/use-delete';
 import { useTour } from '@/lib/hooks/useTour';
 import { Tour } from '@/services/api/tourService';
 import { DASHBOARD_HEADERS_CONFIG } from '@/types/dashboard';
@@ -19,11 +21,17 @@ export const ToursPage = () => {
   // Utilisation du hook tour
   const { tours, isLoading, error, deleteTour } = useTour();
 
-  // Wrapper pour transformer le retour boolean en void
-  const handleDelete = async (id: string): Promise<void> => {
-    await deleteTour(id);
-    setIsInfoOpen(false);
-  };
+  const {
+    isDeleteModalOpen,
+    handleDeleteClick,
+    handleConfirmDelete,
+    closeDeleteModal
+  } = useDelete(deleteTour, {
+    onDeleteSuccess: () => {
+      // Fermer le panneau d'information si ouvert
+      setIsInfoOpen(false);
+    }
+  });
 
   // Gestionnaire pour l'affichage des informations
   const handleViewTour = (tour: Tour) => {
@@ -39,17 +47,14 @@ export const ToursPage = () => {
         isLoading={isLoading}
         error={error}
         data={tours}
-        onDelete={handleDelete}
+        onDelete={handleDeleteClick}
         onView={handleViewTour}
       >
         {/* En-tête avec bouton d'ajout */}
         <div className="mt-6 md:mt-0">
           <Button
             className="w-full"
-            onClick={
-              () => router.push('/tours/add-tour')
-              //console.log('Bouton cliqué, isInfoOpen : ', isInfoOpen);
-            }
+            onClick={() => router.push('/tours/add-tour')}
           >
             <Plus className="mr-2" />
             {DASHBOARD_HEADERS_CONFIG.tours.buttonLabel}
@@ -62,7 +67,15 @@ export const ToursPage = () => {
         isOpen={isInfoOpen}
         onClose={() => setIsInfoOpen(false)}
         tour={selectedTour}
-        onDelete={handleDelete}
+        onDelete={handleDeleteClick}
+      />
+
+      {/* Ajout de la modale de confirmation */}
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={handleConfirmDelete}
+        actionName="supprimer ce tour"
       />
     </>
   );
