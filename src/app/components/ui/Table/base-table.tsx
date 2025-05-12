@@ -145,7 +145,8 @@ export function BaseTable<T extends TableData>({
       return <div>{value?.toString() || '-'}</div>;
     },
     enableSorting: true,
-    filterFn: column.key === 'status' ? statusFilterFn : undefined,
+    filterFn:
+      column.key === 'status' && statusConfig ? statusFilterFn : undefined,
   }));
 
   // Ajout de la colonne d'actions si nécessaire
@@ -243,7 +244,8 @@ export function BaseTable<T extends TableData>({
 
   // Get unique status values
   const uniqueStatusValues = useMemo(() => {
-    if (!data.length || !table.getColumn('status') || !statusConfig) return [];
+    const statusColumn = table.getColumn('status');
+    if (!statusColumn || !data.length || !statusConfig) return [];
 
     // Utiliser les clés du statusConfig comme valeurs de statut valides
     return Object.keys(statusConfig).sort();
@@ -251,10 +253,11 @@ export function BaseTable<T extends TableData>({
 
   // Get counts for each status
   const statusCounts = useMemo(() => {
-    if (!table.getColumn('status')) return new Map<string, number>();
+    const statusColumn = table.getColumn('status');
+    if (!statusColumn) return new Map<string, number>();
 
     const counts = new Map<string, number>();
-    data.forEach((item) => {
+    data.forEach((item: any) => {
       if (item.status) {
         const status = item.status.toString();
         const count = counts.get(status) || 0;
@@ -311,61 +314,63 @@ export function BaseTable<T extends TableData>({
               </button>
             )}
           </div>
-          {/* Filter by status */}
-          {table.getColumn('status') && (
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline">
-                  <FilterIcon
-                    className="-ms-1 opacity-60"
-                    size={16}
-                    aria-hidden="true"
-                  />
-                  Statut
-                  {selectedStatuses.length > 0 && (
-                    <span className="bg-background text-muted-foreground/70 -me-1 ml-2 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
-                      {selectedStatuses.length}
-                    </span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto min-w-36 p-3" align="start">
-                <div className="space-y-3">
-                  <div className="text-muted-foreground text-xs font-medium">
-                    Filtres
-                  </div>
-                  <div className="space-y-3">
-                    {uniqueStatusValues.length > 0 ? (
-                      uniqueStatusValues.map((value, i) => (
-                        <div key={value} className="flex items-center gap-2">
-                          <Checkbox
-                            id={`${tableId}-status-${i}`}
-                            checked={selectedStatuses.includes(value)}
-                            onCheckedChange={(checked) =>
-                              handleStatusChange(!!checked, value)
-                            }
-                          />
-                          <Label
-                            htmlFor={`${tableId}-status-${i}`}
-                            className="flex grow justify-between gap-2 font-normal"
-                          >
-                            {statusConfig?.[value]?.text || value}{' '}
-                            <span className="text-muted-foreground ms-2 text-xs">
-                              {statusCounts.get(value) || 0}
-                            </span>
-                          </Label>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="text-muted-foreground text-sm">
-                        Aucun statut disponible
-                      </div>
+          {/* Filter by status - Only show if status column exists */}
+          {table.getColumn('status') &&
+            statusConfig &&
+            uniqueStatusValues.length > 0 && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline">
+                    <FilterIcon
+                      className="-ms-1 opacity-60"
+                      size={16}
+                      aria-hidden="true"
+                    />
+                    Statut
+                    {selectedStatuses.length > 0 && (
+                      <span className="bg-background text-muted-foreground/70 -me-1 ml-2 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
+                        {selectedStatuses.length}
+                      </span>
                     )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto min-w-36 p-3" align="start">
+                  <div>
+                    <div className="text-muted-foreground text-xs font-medium">
+                      Filtres
+                    </div>
+                    <div className="space-y-3">
+                      {uniqueStatusValues.length > 0 ? (
+                        uniqueStatusValues.map((value, i) => (
+                          <div key={value} className="flex items-center gap-2">
+                            <Checkbox
+                              id={`${tableId}-status-${i}`}
+                              checked={selectedStatuses.includes(value)}
+                              onCheckedChange={(checked) =>
+                                handleStatusChange(!!checked, value)
+                              }
+                            />
+                            <Label
+                              htmlFor={`${tableId}-status-${i}`}
+                              className="flex grow justify-between gap-2 font-normal"
+                            >
+                              {statusConfig?.[value]?.text || value}{' '}
+                              <span className="text-muted-foreground ms-2 text-xs">
+                                {statusCounts.get(value) || 0}
+                              </span>
+                            </Label>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-muted-foreground text-sm">
+                          Aucun statut disponible
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </PopoverContent>
-            </Popover>
-          )}
+                </PopoverContent>
+              </Popover>
+            )}
           {/* Toggle columns visibility */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -501,10 +506,12 @@ export function BaseTable<T extends TableData>({
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                      {
+                        flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        ) as React.ReactNode
+                      }
                     </TableCell>
                   ))}
                 </TableRow>
