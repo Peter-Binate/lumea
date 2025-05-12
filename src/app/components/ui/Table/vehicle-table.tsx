@@ -19,7 +19,6 @@ const columns: Column<Vehicle>[] = [
   { key: 'title', header: 'Nom' },
   { key: 'description', header: 'Description' },
   { key: 'registration', header: 'Immatriculation' },
-  { key: 'status', header: 'Statut' },
   {
     key: 'created_at',
     header: 'Date de création',
@@ -27,13 +26,6 @@ const columns: Column<Vehicle>[] = [
       format(new Date(value), 'dd MMMM yyyy', { locale: fr }),
   },
 ];
-
-// Configuration des statuts
-const statusConfig = {
-  pending: { text: 'En attente', className: 'bg-yellow-100 text-yellow-800' },
-  completed: { text: 'Complété', className: 'bg-green-100 text-green-800' },
-  cancelled: { text: 'Annulé', className: 'bg-red-100 text-red-800' },
-};
 
 export function VehicleTable({
   data,
@@ -48,7 +40,6 @@ export function VehicleTable({
       onDelete={onDelete}
       onEdit={onEdit}
       onView={onView}
-      statusConfig={statusConfig}
     />
   );
 }

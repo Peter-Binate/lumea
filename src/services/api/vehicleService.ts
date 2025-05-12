@@ -7,8 +7,6 @@ export interface Vehicle {
   description: string;
   registration: string;
   created_at: Date;
-  status: 'pending' | 'completed' | 'cancelled';
-  //compartment?: string;
 }
 
 // Configuration des statuts

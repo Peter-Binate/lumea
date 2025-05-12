@@ -34,16 +34,10 @@ export const SideInformation = ({
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-auto">
-        {children}
-      </div>
+      <div className="flex-1 overflow-auto">{children}</div>
 
       {/* Footer Actions */}
-      {footer && (
-        <div className="mt-auto border-t p-4">
-          {footer}
-        </div>
-      )}
+      {footer && <div className="mt-auto border-t p-4">{footer}</div>}
     </div>
   );
 };
