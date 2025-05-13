@@ -31,7 +31,7 @@ export default function RootLayout({
           <PrimaryLayout>
             <LayoutWrapper>
               {children}
-              <Toaster position="top-right" closeButton richColors />
+              <Toaster position="bottom-right" closeButton richColors />
             </LayoutWrapper>
           </PrimaryLayout>
         </AuthProvider>

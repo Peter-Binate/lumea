@@ -83,6 +83,14 @@ import {
 } from 'lucide-react';
 import { useMemo, useRef, useState } from 'react';
 
+const textFilterFn: FilterFn<any> = (row, columnId, filterValue) => {
+  const value = row.getValue(columnId);
+  if (!value) return false;
+  return String(value)
+    .toLowerCase()
+    .includes(String(filterValue).toLowerCase());
+}
+
 export function BaseTable<T extends TableData>({
   data,
   columns,
@@ -102,6 +110,13 @@ export function BaseTable<T extends TableData>({
     pageSize: 5,
   });
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const searchColumnId = useMemo(() => {
+  // Vérifier si la colonne 'title' existe
+  const hasTitle = columns.some(column => column.key === 'title');
+  // Utiliser 'title' si elle existe, sinon utiliser la première colonne
+  return hasTitle ? 'title' : columns[0]?.key as string;
+}, [columns]);
 
   // Génération d'un ID unique pour les checkboxes de statut
   const tableId = useMemo(
@@ -149,9 +164,9 @@ export function BaseTable<T extends TableData>({
       // Rendu par défaut
       return <div>{value?.toString() || '-'}</div>;
     },
-    enableSorting: true,
-    filterFn:
-      column.key === 'status' && statusConfig ? statusFilterFn : undefined,
+    enableSorting: false,
+    
+    filterFn: column.key === 'status' ? statusFilterFn : textFilterFn,
   }));
 
   // Ajout de la colonne d'actions si nécessaire
@@ -294,14 +309,11 @@ export function BaseTable<T extends TableData>({
             <Input
               ref={inputRef}
               placeholder="Rechercher..."
-              value={
-                (table.getColumn('title')?.getFilterValue() as string) ?? ''
-              }
-              onChange={(e) =>
-                table.getColumn('title')?.setFilterValue(e.target.value)
-              }
+              value={(table.getColumn(searchColumnId)?.getFilterValue() as string) ?? ''}
+              onChange={(e) => table.getColumn(searchColumnId)?.setFilterValue(e.target.value)}
               className="max-w-sm pl-9 pr-9"
             />
+            
             <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
               <ListFilterIcon size={16} aria-hidden="true" />
             </div>
