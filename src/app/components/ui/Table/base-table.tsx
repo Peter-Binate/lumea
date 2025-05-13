@@ -120,6 +120,11 @@ export function BaseTable<T extends TableData>({
     return filterValue.includes(status);
   };
 
+  const hasStatusColumn = useMemo(() => {
+    // Vérifier si la colonne de statut est définie dans les colonnes
+    return columns.some(column => column.key === 'status');
+  }, [columns]);
+
   // Conversion des colonnes en format TanStack Table
   const tableColumns: ColumnDef<T>[] = columns.map((column) => ({
     accessorKey: column.key as string,
@@ -214,17 +219,18 @@ export function BaseTable<T extends TableData>({
 
   // Récupérer les statuts sélectionnés
   const selectedStatuses = useMemo(() => {
-    const statusColumn = table.getColumn('status');
-    if (!statusColumn) return [];
-    const filterValue = statusColumn.getFilterValue() as string[];
-    return filterValue ?? [];
-  }, [table.getColumn('status')?.getFilterValue()]);
+  // Vérifier si la colonne status existe avant d'essayer d'y accéder
+  const statusColumn = hasStatusColumn ? table.getColumn('status') : null;
+  if (!statusColumn) return [];
+  const filterValue = statusColumn.getFilterValue() as string[];
+  return filterValue ?? [];
+}, [table, hasStatusColumn]);
 
   // Fonction pour gérer le changement de statut
   const handleStatusChange = (checked: boolean, value: string) => {
-    const statusColumn = table.getColumn('status');
+    const statusColumn = hasStatusColumn ? table.getColumn('status') : null;
     if (!statusColumn) return;
-
+    
     const filterValue = statusColumn.getFilterValue() as string[];
     const newFilterValue = filterValue ? [...filterValue] : [];
 
@@ -244,16 +250,16 @@ export function BaseTable<T extends TableData>({
 
   // Get unique status values
   const uniqueStatusValues = useMemo(() => {
-    const statusColumn = table.getColumn('status');
+    const statusColumn = hasStatusColumn ? table.getColumn('status') : null;
     if (!statusColumn || !data.length || !statusConfig) return [];
 
     // Utiliser les clés du statusConfig comme valeurs de statut valides
     return Object.keys(statusConfig).sort();
-  }, [data, table.getColumn('status'), statusConfig]);
+  }, [data, table, hasStatusColumn, statusConfig]);
 
   // Get counts for each status
   const statusCounts = useMemo(() => {
-    const statusColumn = table.getColumn('status');
+    const statusColumn = hasStatusColumn ? table.getColumn('status') : null;
     if (!statusColumn) return new Map<string, number>();
 
     const counts = new Map<string, number>();
@@ -266,7 +272,7 @@ export function BaseTable<T extends TableData>({
     });
 
     return counts;
-  }, [data, table.getColumn('status')]);
+  }, [data, table, hasStatusColumn]);
 
   // Fonction pour gérer la suppression des lignes sélectionnées
   const handleDeleteRows = () => {
@@ -315,7 +321,7 @@ export function BaseTable<T extends TableData>({
             )}
           </div>
           {/* Filter by status - Only show if status column exists */}
-          {table.getColumn('status') &&
+          {hasStatusColumn &&
             statusConfig &&
             uniqueStatusValues.length > 0 && (
               <Popover>
