@@ -1,250 +1,293 @@
-import { Alert, AlertDescription, AlertTitle } from '@/app/components/ui/alert';
-import { Card } from '@/app/components/ui/card';
-import { Progress } from '@/app/components/ui/progress';
-import { CheckCircle2, File, Upload, X } from 'lucide-react';
-import Image from 'next/image';
-import { useCallback, useEffect, useState } from 'react';
-import { useDropzone } from 'react-dropzone';
+"use client";
+
+import { Button } from "@/app/components/ui/button";
+import { cn } from "@/lib/utils";
+import { Check, Cloud, X } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Accept, useDropzone } from "react-dropzone";
+import { UploadProgress } from "./upload-progress";
 
 type FileWithPreview = {
   file: File;
   id: string;
-  preview?: string;
-  progress: number;
-  uploaded: boolean;
-  error?: string;
+  previewUrl: string;
 };
 
+type UploadStatus = "idle" | "preview" | "uploading" | "success" | "error";
+
 type MediaUploaderProps = {
-  onFilesUpdated: (files: File[]) => void;
-  maxFiles: number;
-  acceptedFileTypes?: string[];
+  onFileUpdated: (file: File | null) => void;
+  acceptedFileTypes?: Accept;
+  initialFileUrl?: string | null;
+  clearFile?: boolean;
 };
 
 export const MediaUploader = ({
-  onFilesUpdated,
-  maxFiles,
+  onFileUpdated,
+  acceptedFileTypes = { "video/*": [".mp4", ".mov", ".webm"] },
+  initialFileUrl = null,
+  clearFile = false,
 }: MediaUploaderProps) => {
-  const [files, setFiles] = useState<FileWithPreview[]>([]);
-  const [uploadedCount, setUploadedCount] = useState(0);
-  const isLimitReached = uploadedCount >= maxFiles;
+  const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(
+    null
+  );
+  const [uploadStatus, setUploadStatus] = useState<UploadStatus>("idle");
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Mise à jour du nombre de fichiers uploadés
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
   useEffect(() => {
-    const count = files.length;
-    setUploadedCount(count);
-    
-    const currentFiles = files.map((f) => f.file);
-    onFilesUpdated(currentFiles);
-}, [files, onFilesUpdated]);
+    if (clearFile) {
+      handleRemoveFile(true);
+    }
+  }, [clearFile]);
 
-  // Simulation d'upload de fichier
-  const uploadFile = useCallback((fileItem: FileWithPreview) => {
-    if (fileItem.uploaded) return;
+  useEffect(() => {
+    if (typeof onFileUpdated !== 'function') {
+      console.error("onFileUpdated n'est pas une fonction :", onFileUpdated);
+      return;
+    }
 
-    // Simulation d'upload plus rapide et directe
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += 20; // Plus rapide (20% à la fois)
-      
-      setFiles((prev) =>
-        prev.map((f) => (f.id === fileItem.id ? { ...f, progress } : f))
-      );
-
-      if (progress >= 100) {
-        clearInterval(interval);
-        setFiles((prev) =>
-          prev.map((f) => (f.id === fileItem.id ? { ...f, uploaded: true } : f))
-        );
+    if (initialFileUrl && !selectedFile) {
+      try {
+        const placeholderFile = new File([] as BlobPart[], "fichier_existant.mp4", { type: "video/mp4" });
+        
+        setSelectedFile({
+          id: crypto.randomUUID(),
+          file: placeholderFile,
+          previewUrl: initialFileUrl,
+        });
+        setUploadStatus("success");
+      } catch (error) {
+        console.error("Erreur lors de la création du file placeholder:", error);
       }
-    }, 100); // Intervalle plus court
+    }
+  }, [initialFileUrl, onFileUpdated, selectedFile]);
+
+  const revokePreviewUrl = useCallback((url?: string) => {
+    if (url && url.startsWith("blob:")) {
+      URL.revokeObjectURL(url);
+    }
   }, []);
 
-  // Gestionnaire pour le drag and drop de fichiers
-  const onDrop = useCallback(
-    (acceptedFiles: File[]) => {
-      if (isLimitReached) return;
+  const handleRemoveFile = useCallback((isSilentClear: boolean = false) => {
+    if (selectedFile) {
+      revokePreviewUrl(selectedFile.previewUrl);
+    }
+    setSelectedFile(null);
+    setUploadStatus("idle");
+    setUploadProgress(0);
+    setErrorMessage(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+    
+    if (!isSilentClear && typeof onFileUpdated === 'function') {
+      onFileUpdated(null);
+    }
+  }, [selectedFile, onFileUpdated, revokePreviewUrl]);
 
-      const remainingSlots = maxFiles - uploadedCount;
-      const filesToAdd = acceptedFiles.slice(0, remainingSlots);
+  useEffect(() => {
+    return () => {
+      if (selectedFile?.previewUrl) {
+        revokePreviewUrl(selectedFile.previewUrl);
+      }
+    };
+  }, [selectedFile, revokePreviewUrl]);
 
-      const newFiles = filesToAdd.map((file) => ({
+  // Fonction pour gérer le changement de fichier via l'input file standard
+  const handleFileChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      
+      if (!file) return;
+      
+      if (typeof onFileUpdated !== 'function') {
+        console.error("onFileUpdated n'est pas une fonction dans handleFileChange");
+        setErrorMessage("Erreur interne: gestionnaire de fichier non disponible");
+        setUploadStatus("error");
+        return;
+      }
+
+      if (selectedFile?.previewUrl) {
+        revokePreviewUrl(selectedFile.previewUrl);
+      }
+      
+      const newFileWithPreview = {
         file,
         id: crypto.randomUUID(),
-        preview: file.type.startsWith('image/')
-          ? URL.createObjectURL(file)
-          : undefined,
-        progress: 0,
-        uploaded: false,
-      }));
-
-      setFiles((prev) => [...prev, ...newFiles]);
-
-      // Commencer automatiquement l'upload de chaque fichier
-      newFiles.forEach((fileItem) => {
-        uploadFile(fileItem);
-      });
+        previewUrl: URL.createObjectURL(file),
+      };
+      
+      setSelectedFile(newFileWithPreview);
+      setUploadStatus("preview");
+      setUploadProgress(0);
+      setErrorMessage(null);
+      onFileUpdated(file);
     },
-    [uploadedCount, isLimitReached, uploadFile, maxFiles]
+    [onFileUpdated, revokePreviewUrl, selectedFile]
+  );
+
+  const onDrop = useCallback(
+    (acceptedFiles: File[], rejectedFiles: any[]) => {
+      if (typeof onFileUpdated !== 'function') {
+        console.error("onFileUpdated n'est pas une fonction dans onDrop");
+        setErrorMessage("Erreur interne: gestionnaire de fichier non disponible");
+        setUploadStatus("error");
+        return;
+      }
+
+      if (rejectedFiles && rejectedFiles.length > 0) {
+        setErrorMessage("Type de fichier non supporté ou fichier trop volumineux.");
+        setUploadStatus("error");
+        setSelectedFile(null);
+        onFileUpdated(null);
+        return;
+      }
+
+      if (acceptedFiles && acceptedFiles.length > 0) {
+        const file = acceptedFiles[0];
+        if (selectedFile?.previewUrl) {
+          revokePreviewUrl(selectedFile.previewUrl);
+        }
+        
+        const newFileWithPreview = {
+          file,
+          id: crypto.randomUUID(),
+          previewUrl: URL.createObjectURL(file),
+        };
+        setSelectedFile(newFileWithPreview);
+        setUploadStatus("preview");
+        setUploadProgress(0);
+        setErrorMessage(null);
+        onFileUpdated(file);
+      }
+    },
+    [onFileUpdated, revokePreviewUrl, selectedFile]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: {
-      'video/mp4': ['.mp4'],
-      'video/quicktime': ['.mov'],
-      'video/webm': ['.webm'],
-    },
-    multiple: true,
-    disabled: isLimitReached,
+    accept: acceptedFileTypes,
+    multiple: false,
+    noClick: true, 
+    disabled: uploadStatus === "uploading" || uploadStatus === "success",
   });
 
-  // Suppression d'un fichier
-  const removeFile = (id: string) => {
-    setFiles((prev) => {
-      const filtered = prev.filter((file) => file.id !== id);
-      // Libérer l'URL d'objet pour éviter les fuites de mémoire
-      const fileToRemove = prev.find((file) => file.id === id);
-      if (fileToRemove?.preview) {
-        URL.revokeObjectURL(fileToRemove.preview);
-      }
-      return filtered;
-    });
+  const handleChooseFile = useCallback(() => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  }, []);
+
+  const renderContent = () => {
+    switch (uploadStatus) {
+      case "idle":
+        return (
+          <>
+            <Cloud className="h-10 w-10 text-gray-400 mb-2" />
+            <p className="text-sm text-center text-muted-foreground">
+              Déposez votre vidéo ici ou{" "}
+              <span
+                className="text-primary cursor-pointer font-medium hover:underline"
+                onClick={handleChooseFile}
+              >
+                choisissez un fichier
+              </span>
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Types supportés : MP4, MOV, WEBM. Max 50MB.
+            </p>
+            {/* Ajout d'un input file caché mais contrôlé par nous */}
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              className="hidden" 
+              onChange={handleFileChange}
+              accept={Object.entries(acceptedFileTypes)
+                .map(([type, exts]) => `${type},${exts.join(',')}`)
+                .join(',')}
+            />
+          </>
+        );
+      case "preview":
+        if (selectedFile) {
+          return (
+            <div className="relative w-full h-full">
+              <video
+                ref={videoRef}
+                src={selectedFile.previewUrl}
+                className="w-full h-full object-contain rounded-md"
+                controls
+              />
+              <Button
+                variant="destructive"
+                size="icon"
+                onClick={() => handleRemoveFile()}
+                className="absolute top-2 right-2 bg-background/80 rounded-full p-1 shadow-md h-7 w-7"
+              >
+                <X className="h-4 w-4" />
+                <span className="sr-only">Supprimer la vidéo</span>
+              </Button>
+            </div>
+          );
+        }
+        return null;
+      case "uploading":
+        return <UploadProgress progress={uploadProgress} />;
+      case "success":
+        return (
+          <div className="flex flex-col items-center justify-center h-full text-center">
+            <div className="bg-green-100 rounded-full p-2 mb-3">
+              <Check className="h-6 w-6 text-green-600" />
+            </div>
+            <p className="text-sm font-medium text-foreground">
+              Fichier {initialFileUrl && !selectedFile?.file.size ? 'existant chargé' : 'prêt à être envoyé !'}
+            </p>
+            {selectedFile && (
+              <p className="text-xs text-muted-foreground truncate max-w-[calc(100%-2rem)]">
+                {selectedFile.file.name}
+              </p>
+            )}
+            <Button variant="link" size="sm" onClick={handleChooseFile} className="mt-3">
+              Changer de fichier
+            </Button>
+          </div>
+        );
+      case "error":
+        return (
+          <div className="flex flex-col items-center justify-center h-full text-center">
+            <p className="text-sm text-red-500 mb-2">
+              {errorMessage || "Une erreur est survenue."}
+            </p>
+            <Button variant="outline" size="sm" onClick={handleChooseFile}>
+              Réessayer
+            </Button>
+          </div>
+        );
+      default:
+        return null;
+    }
   };
 
-  // Nettoyage des URL d'objets lorsque le composant se démonte
-  useEffect(() => {
-    return () => {
-      files.forEach((fileItem) => {
-        if (fileItem.preview) {
-          URL.revokeObjectURL(fileItem.preview);
-        }
-      });
-    };
-  }, [files]);
-
   return (
-    <div className="space-y-4 w-full">
-      <h2 className="text-lg font-medium text-gray-800 mb-4">Média</h2>
-
-      <div className="space-y-4">
-        {isLimitReached ? (
-          <Alert className="bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-900">
-            <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
-            <AlertTitle className="text-green-800 dark:text-green-300">
-              Upload terminé !
-            </AlertTitle>
-            <AlertDescription className="text-green-700 dark:text-green-400">
-              Vous avez téléchargé {maxFiles} photos avec succès. Merci !
-            </AlertDescription>
-          </Alert>
-        ) : (
-          <div
-            {...getRootProps()}
-            className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
-              isDragActive
-                ? 'border-primary bg-primary/5'
-                : 'border-gray-300 hover:border-primary/50'
-            }`}
-          >
-            <input {...getInputProps()} />
-            <div className="flex flex-col items-center justify-center gap-2">
-              <Upload className="h-8 w-8 text-muted-foreground" />
-              <h3 className="text-base font-medium">
-                {isDragActive
-                  ? 'Déposez votre vidéo ici'
-                  : 'Glissez & déposez votre vidéo ici'}
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                ou cliquez pour parcourir (MP4, MOV, WEBM){' '}
-                <span className="text-red-500">*</span>
-              </p>
-              <p className="text-sm font-medium mt-1">
-                {uploadedCount} sur {maxFiles} vidéo téléchargée
-              </p>
-            </div>
-          </div>
+    <div className="w-full space-y-3">
+      <div
+        {...getRootProps()}
+        className={cn(
+          "border-2 border-dashed rounded-lg relative flex flex-col items-center justify-center h-64 p-4 transition-colors",
+          isDragActive ? "border-primary bg-primary/5" : "border-gray-300 hover:border-primary/50",
+          (uploadStatus === "preview" || uploadStatus === "success") && "border-muted bg-muted/50",
+          uploadStatus === "uploading" && "border-blue-300 bg-blue-50",
+          uploadStatus === "error" && "border-destructive bg-destructive/5",
+          (selectedFile && uploadStatus !== 'idle' && uploadStatus !== 'preview') && 'p-0',
+          (selectedFile && uploadStatus === 'preview') && 'p-0 border-solid'
         )}
-
-        {files.length > 0 && (
-          <FilePreviewGrid files={files} onRemove={removeFile} />
-        )}
+      >
+        {renderContent()}
       </div>
     </div>
   );
 };
-
-// Sous-composant pour afficher la grille de fichiers
-type FilePreviewGridProps = {
-  files: FileWithPreview[];
-  onRemove: (id: string) => void;
-};
-
-export const FilePreviewGrid = ({ files, onRemove }: FilePreviewGridProps) => (
-  <div className="mt-4">
-    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3">
-      {files.map((fileItem) => (
-        <FilePreviewCard
-          key={fileItem.id}
-          fileItem={fileItem}
-          onRemove={onRemove}
-        />
-      ))}
-    </div>
-  </div>
-);
-
-// Sous-composant pour chaque fichier
-type FilePreviewCardProps = {
-  fileItem: FileWithPreview;
-  onRemove: (id: string) => void;
-};
-
-export const FilePreviewCard = ({
-  fileItem,
-  onRemove,
-}: FilePreviewCardProps) => (
-  <Card className="overflow-hidden">
-    <div className="relative aspect-square">
-      {fileItem.preview ? (
-        <Image
-          src={fileItem.preview || '/placeholder.svg'}
-          alt={fileItem.file.name}
-          fill
-          sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
-          className="object-cover"
-        />
-      ) : (
-        <div className="flex h-full w-full items-center justify-center bg-muted">
-          <File className="h-10 w-10 text-muted-foreground" />
-          <span className="sr-only">{fileItem.file.name}</span>
-        </div>
-      )}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onRemove(fileItem.id);
-        }}
-        className="absolute top-2 right-2 rounded-full bg-background/80 p-1 text-foreground backdrop-blur-sm"
-      >
-        <X className="h-3 w-3" />
-        <span className="sr-only">Supprimer le fichier</span>
-      </button>
-      {fileItem.uploaded && (
-        <div className="absolute bottom-2 right-2 rounded-full bg-background/80 p-1 text-green-500 backdrop-blur-sm">
-          <CheckCircle2 className="h-3 w-3" />
-          <span className="sr-only">Téléchargé</span>
-        </div>
-      )}
-    </div>
-    <div className="p-2">
-      <div className="truncate text-xs font-medium">{fileItem.file.name}</div>
-      <div className="text-[10px] text-muted-foreground">
-        {(fileItem.file.size / 1024 / 1024).toFixed(2)} MB
-      </div>
-      {!fileItem.uploaded && (
-        <Progress value={fileItem.progress} className="h-1 mt-2" />
-      )}
-    </div>
-  </Card>
-);

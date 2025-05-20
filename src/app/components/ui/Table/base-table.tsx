@@ -48,21 +48,28 @@ import {
   TableHeader,
   TableRow,
 } from '@/app/components/ui/Table/table';
-import { cn } from '@/lib/utils';
-import { BaseTableProps, TableData } from '@/types/table';
 import {
-  ColumnDef,
-  ColumnFiltersState,
-  FilterFn,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/app/components/ui/tooltip";
+import { cn } from '@/lib/utils';
+import type { BaseTableProps, TableData } from '@/types/table';
+import {
+  type ColumnDef,
+  type ColumnFiltersState,
+  type FilterFn,
   flexRender,
   getCoreRowModel,
+  getFacetedUniqueValues,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  PaginationState,
-  SortingState,
+  type PaginationState,
+  type SortingState,
   useReactTable,
-  VisibilityState,
+  type VisibilityState,
 } from '@tanstack/react-table';
 import {
   ChevronDown,
@@ -81,25 +88,26 @@ import {
   Trash2,
   TrashIcon,
 } from 'lucide-react';
-import { useMemo, useRef, useState } from 'react';
+import { type ReactNode, useMemo, useRef, useState } from 'react';
 
+/*----SearchBar----*/
 const textFilterFn: FilterFn<any> = (row, columnId, filterValue) => {
   const value = row.getValue(columnId);
-  if (!value) return false;
+  if (value === null || typeof value === 'undefined') return false;
   return String(value)
     .toLowerCase()
     .includes(String(filterValue).toLowerCase());
-}
+};
 
-export function BaseTable<T extends TableData>({
+export const BaseTable = <T extends TableData>({
   data,
   columns,
   onDelete,
   onEdit,
   onView,
   statusConfig,
-}: BaseTableProps<T>) {
-  // États pour le tableau
+}: BaseTableProps<T>) => {
+  // Component States
   const [sorting, setSorting] = useState<SortingState>([
     { id: 'created_at', desc: true },
   ]);
@@ -111,108 +119,133 @@ export function BaseTable<T extends TableData>({
   });
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Memoized search column ID
   const searchColumnId = useMemo(() => {
-  // Vérifier si la colonne 'title' existe
-  const hasTitle = columns.some(column => column.key === 'title');
-  // Utiliser 'title' si elle existe, sinon utiliser la première colonne
-  return hasTitle ? 'title' : columns[0]?.key as string;
-}, [columns]);
+    const hasTitleColumn = columns.some(column => column.key === 'title');
+    return hasTitleColumn ? 'title' : (columns[0]?.key as string | undefined) ?? '';
+  }, [columns]);
 
-  // Génération d'un ID unique pour les checkboxes de statut
   const tableId = useMemo(
     () => `table-${Math.random().toString(36).substring(2, 9)}`,
     []
   );
 
-  // Filtre personnalisé pour filtrer par statut
+  const tableHasStatusColumn = useMemo(
+    () => columns.some(column => column.key === 'status'),
+    [columns]
+  );
+
+  // Helper: Custom filter function for status column
   const statusFilterFn: FilterFn<T> = (
     row,
     columnId,
     filterValue: string[]
   ) => {
     if (!filterValue?.length) return true;
-    const status = row.getValue(columnId) as string;
-    return filterValue.includes(status);
+    const rowStatusValue = row.getValue(columnId);
+    if (rowStatusValue === null || typeof rowStatusValue === 'undefined') return false;
+    const statusString = String(rowStatusValue);
+    return filterValue.includes(statusString);
   };
+  
+  // TanStack Table column definitions
+  const tableColumns: ColumnDef<T>[] = useMemo(() => {
+    const mappedColumns: ColumnDef<T>[] = columns.map((column) => ({
+      accessorKey: column.key as string,
+      header: column.header,
+      cell: ({ row }) => {
+        const value = row.getValue(column.key as string);
 
-  const hasStatusColumn = useMemo(() => {
-    // Vérifier si la colonne de statut est définie dans les colonnes
-    return columns.some(column => column.key === 'status');
-  }, [columns]);
+        if (column.key === 'status' && statusConfig) {
+          const currentStatus = String(value);
+          const statusDisplay = statusConfig[currentStatus] || {
+            text: 'Inconnu',
+            className: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200',
+          };
+          return <Badge className={cn(statusDisplay.className)}>{statusDisplay.text}</Badge>;
+        }
 
-  // Conversion des colonnes en format TanStack Table
-  const tableColumns: ColumnDef<T>[] = columns.map((column) => ({
-    accessorKey: column.key as string,
-    header: column.header,
-    cell: ({ row }) => {
-      const value = row.getValue(column.key as string);
+        if (column.render) {
+          return column.render(value, row.original) as ReactNode;
+        }
 
-      // Rendu personnalisé pour le statut
-      if (column.key === 'status' && statusConfig) {
-        const status = statusConfig[value as string | number] || {
-          text: 'Inconnu',
-          className: 'bg-gray-100 text-gray-800',
-        };
-        return <Badge className={cn(status.className)}>{status.text}</Badge>;
-      }
+        // Default rendering
+        return <div>{typeof value !== 'undefined' && value !== null ? String(value) : '-'}</div>;
+      },
+      enableSorting: true, // Enable sorting for most columns
+      filterFn: column.key === 'status' ? statusFilterFn : textFilterFn, 
+    }));
 
-      // Rendu personnalisé si spécifié
-      if (column.render) {
-        return column.render(value);
-      }
+    if (onDelete || onEdit || onView) {
+      mappedColumns.push({
+        id: 'actions',
+        header: '',
+        cell: ({ row }) => (
+          <div className="flex justify-end space-x-2">
+            {/* View button tooltip */}
+            {onView && (
+              <TooltipProvider delayDuration={0}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onView(row.original)}
+                      className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                      aria-label="View details"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="px-2 py-1 text-xs" align="start" alignOffset={-6}>
+                    Voir
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+            {onEdit && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onEdit(row.original)}
+                className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
+                aria-label="Edit item"
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+            )}
+            {/* Delete button tooltip */}
+            {onDelete && (
+              <TooltipProvider delayDuration={0}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onDelete(row.original.id)}
+                      className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                      aria-label="Delete item"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="px-2 py-1 text-xs" align="center" sideOffset={6}>
+                    Supprimer
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+          </div>
+        ),
+        enableSorting: false,
+        enableHiding: false,
+      });
+    }
+    return mappedColumns;
+  }, [columns, statusConfig, onView, onEdit, onDelete, statusFilterFn]);
 
-      // Rendu par défaut
-      return <div>{value?.toString() || '-'}</div>;
-    },
-    enableSorting: false,
-    
-    filterFn: column.key === 'status' ? statusFilterFn : textFilterFn,
-  }));
 
-  // Ajout de la colonne d'actions si nécessaire
-  if (onDelete || onEdit || onView) {
-    tableColumns.push({
-      id: 'actions',
-      header: '',
-      cell: ({ row }) => (
-        <div className="flex justify-end space-x-2">
-          {onView && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onView(row.original)}
-              className="text-blue-600 hover:text-blue-900"
-            >
-              <Eye className="h-4 w-4" />
-            </Button>
-          )}
-          {onEdit && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onEdit(row.original)}
-              className="text-indigo-600 hover:text-indigo-900"
-            >
-              <Edit className="h-4 w-4" />
-            </Button>
-          )}
-          {onDelete && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onDelete(row.original.id)}
-              className="text-red-600 hover:text-red-900"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
-      ),
-      enableSorting: false,
-    });
-  }
-
-  // Initialisation de la table
+  // TanStack Table instance
   const table = useReactTable({
     data,
     columns: tableColumns,
@@ -220,6 +253,7 @@ export function BaseTable<T extends TableData>({
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getFacetedUniqueValues: getFacetedUniqueValues(), 
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
@@ -230,200 +264,198 @@ export function BaseTable<T extends TableData>({
       columnVisibility,
       pagination,
     },
+    filterFns: {
+        statusFilterFn, 
+        textFilterFn
+    },
+    enableRowSelection: true, 
   });
 
-  // Récupérer les statuts sélectionnés
   const selectedStatuses = useMemo(() => {
-  // Vérifier si la colonne status existe avant d'essayer d'y accéder
-  const statusColumn = hasStatusColumn ? table.getColumn('status') : null;
-  if (!statusColumn) return [];
-  const filterValue = statusColumn.getFilterValue() as string[];
-  return filterValue ?? [];
-}, [table, hasStatusColumn]);
+    if (!tableHasStatusColumn) return [];
+    const statusColumn = table.getColumn('status');
+    if (!statusColumn) return [];
+    return (statusColumn.getFilterValue() as string[]) || [];
+  }, [table, tableHasStatusColumn, columnFilters]); 
 
-  // Fonction pour gérer le changement de statut
-  const handleStatusChange = (checked: boolean, value: string) => {
-    const statusColumn = hasStatusColumn ? table.getColumn('status') : null;
+  // Handler for status checkbox changes
+  const handleStatusChange = (isChecked: boolean, statusValueToToggle: string | number) => {
+    if (!tableHasStatusColumn) return;
+    const statusColumn = table.getColumn('status');
     if (!statusColumn) return;
-    
-    const filterValue = statusColumn.getFilterValue() as string[];
-    const newFilterValue = filterValue ? [...filterValue] : [];
 
-    if (checked) {
-      newFilterValue.push(value);
-    } else {
-      const index = newFilterValue.indexOf(value);
-      if (index > -1) {
-        newFilterValue.splice(index, 1);
+    const statusString = String(statusValueToToggle); 
+    const currentSelected = (statusColumn.getFilterValue() as string[]) || [];
+    let newSelected: string[];
+
+    if (isChecked) {
+      if (!currentSelected.includes(statusString)) {
+        newSelected = [...currentSelected, statusString];
+      } else {
+        newSelected = [...currentSelected]; 
       }
+    } else {
+      newSelected = currentSelected.filter(s => s !== statusString);
     }
-
-    statusColumn.setFilterValue(
-      newFilterValue.length ? newFilterValue : undefined
-    );
+    statusColumn.setFilterValue(newSelected.length > 0 ? newSelected : undefined);
   };
 
-  // Get unique status values
   const uniqueStatusValues = useMemo(() => {
-    const statusColumn = hasStatusColumn ? table.getColumn('status') : null;
-    if (!statusColumn || !data.length || !statusConfig) return [];
-
-    // Utiliser les clés du statusConfig comme valeurs de statut valides
-    return Object.keys(statusConfig).sort();
-  }, [data, table, hasStatusColumn, statusConfig]);
-
-  // Get counts for each status
-  const statusCounts = useMemo(() => {
-    const statusColumn = hasStatusColumn ? table.getColumn('status') : null;
-    if (!statusColumn) return new Map<string, number>();
-
-    const counts = new Map<string, number>();
-    data.forEach((item: any) => {
-      if (item.status) {
-        const status = item.status.toString();
-        const count = counts.get(status) || 0;
-        counts.set(status, count + 1);
-      }
-    });
-
-    return counts;
-  }, [data, table, hasStatusColumn]);
-
-  // Fonction pour gérer la suppression des lignes sélectionnées
-  const handleDeleteRows = () => {
-    if (onDelete) {
-      table.getSelectedRowModel().rows.forEach((row) => {
-        onDelete(row.original.id);
+    if (!tableHasStatusColumn || !statusConfig) return [];
+    const statusColumn = table.getColumn('status');
+    if (!statusColumn) return [];
+    
+    const facetedValues = Array.from(statusColumn.getFacetedUniqueValues().keys());
+    
+    return facetedValues
+      .map(String) 
+      .filter(value => typeof statusConfig[value] !== 'undefined' || typeof statusConfig[Number(value)] !== 'undefined') 
+      .sort((a, b) => {
+        // Attempt to sort numerically if statuses are numbers, otherwise string sort
+        const numA = Number(a);
+        const numB = Number(b);
+        if (!isNaN(numA) && !isNaN(numB)) {
+          return numA - numB;
+        }
+        return a.localeCompare(b);
       });
+  }, [table, tableHasStatusColumn, statusConfig, columnFilters]); 
+
+  const statusCounts = useMemo(() => {
+    if (!tableHasStatusColumn) return new Map<string | number, number>();
+    const statusColumn = table.getColumn('status');
+    return statusColumn ? statusColumn.getFacetedUniqueValues() : new Map<string | number, number>();
+  }, [table, tableHasStatusColumn, columnFilters]); 
+
+  // Helper to check if a status is currently selected in the filter
+  const isStatusSelected = (statusValue: string | number) => {
+    return selectedStatuses.includes(String(statusValue));
+  };
+  
+  // Handler for deleting selected rows
+  const handleDeleteSelectedRows = () => { 
+    if (onDelete && table.getSelectedRowModel().rows.length > 0) {
+      table.getSelectedRowModel().rows.forEach((row) => {
+        onDelete(row.original.id); 
+      });
+      table.resetRowSelection(); 
     }
-    table.resetRowSelection();
   };
 
   return (
     <div className="space-y-4">
-      {/* Filters */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          {/* Filter by name or email */}
-          <div className="relative">
-            <Input
-              ref={inputRef}
-              placeholder="Rechercher..."
-              value={(table.getColumn(searchColumnId)?.getFilterValue() as string) ?? ''}
-              onChange={(e) => table.getColumn(searchColumnId)?.setFilterValue(e.target.value)}
-              className="max-w-sm pl-9 pr-9"
-            />
-            
-            <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
-              <ListFilterIcon size={16} aria-hidden="true" />
+      {/* Filters Section */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3"> 
+          {/* Global search input */}
+          {searchColumnId && (
+            <div className="relative">
+              <Input
+                ref={inputRef}
+                placeholder="Rechercher..."
+                value={(table.getColumn(searchColumnId)?.getFilterValue() as string) ?? ''}
+                onChange={(e) => table.getColumn(searchColumnId)?.setFilterValue(e.target.value)}
+                className="max-w-xs w-full sm:max-w-sm pl-9 pr-9" 
+              />
+              <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3">
+                <ListFilterIcon size={16} aria-hidden="true" />
+              </div>
+              {Boolean(table.getColumn(searchColumnId)?.getFilterValue()) && (
+                <button
+                  type="button"
+                  className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                  aria-label="Clear filter"
+                  onClick={() => {
+                    table.getColumn(searchColumnId)?.setFilterValue('');
+                    inputRef.current?.focus();
+                  }}
+                >
+                  <CircleXIcon size={16} aria-hidden="true" />
+                </button>
+              )}
             </div>
-            {Boolean(table.getColumn('title')?.getFilterValue()) && (
-              <button
-                className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
-                aria-label="Clear filter"
-                onClick={() => {
-                  table.getColumn('title')?.setFilterValue('');
-                  if (inputRef.current) {
-                    inputRef.current.focus();
-                  }
-                }}
-              >
-                <CircleXIcon size={16} aria-hidden="true" />
-              </button>
-            )}
-          </div>
-          {/* Filter by status - Only show if status column exists */}
-          {hasStatusColumn &&
+          )}
+
+          {/* Status Filter Popover */}
+          {tableHasStatusColumn &&
             statusConfig &&
             uniqueStatusValues.length > 0 && (
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="outline">
-                    <FilterIcon
-                      className="-ms-1 opacity-60"
-                      size={16}
-                      aria-hidden="true"
-                    />
+                    <FilterIcon className="-ms-1 opacity-60" size={16} aria-hidden="true" />
                     Statut
                     {selectedStatuses.length > 0 && (
-                      <span className="bg-background text-muted-foreground/70 -me-1 ml-2 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
+                      <span className="bg-secondary text-secondary-foreground -me-1 ml-2 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
                         {selectedStatuses.length}
                       </span>
                     )}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto min-w-36 p-3" align="start">
+                <PopoverContent className="w-auto min-w-48 p-3" align="start"> 
                   <div>
-                    <div className="text-muted-foreground text-xs font-medium">
-                      Filtres
+                    <div className="text-muted-foreground text-xs font-medium mb-2">
+                      Filtrer par statut
                     </div>
                     <div className="space-y-3">
-                      {uniqueStatusValues.length > 0 ? (
-                        uniqueStatusValues.map((value, i) => (
-                          <div key={value} className="flex items-center gap-2">
+                      {uniqueStatusValues.map((statusValue, i) => {
+                        const displayValue = statusConfig[String(statusValue)]?.text || 
+                                             statusConfig[Number(statusValue)]?.text || 
+                                             String(statusValue);
+                        const count = statusCounts.get(statusValue) || statusCounts.get(Number(statusValue)) || 0;
+
+                        return (
+                          <div key={`${tableId}-status-${String(statusValue)}`} className="flex items-center gap-2">
                             <Checkbox
-                              id={`${tableId}-status-${i}`}
-                              checked={selectedStatuses.includes(value)}
-                              onCheckedChange={(checked) =>
-                                handleStatusChange(!!checked, value)
-                              }
+                              id={`${tableId}-status-filter-${i}`} 
+                              checked={isStatusSelected(statusValue)}
+                              onCheckedChange={(checked) => {
+                                handleStatusChange(!!checked, statusValue);
+                              }}
+                              aria-labelledby={`${tableId}-status-label-${i}`}
                             />
                             <Label
-                              htmlFor={`${tableId}-status-${i}`}
-                              className="flex grow justify-between gap-2 font-normal"
+                              htmlFor={`${tableId}-status-filter-${i}`}
+                              id={`${tableId}-status-label-${i}`}
+                              className="flex grow cursor-pointer justify-between gap-2 font-normal"
                             >
-                              {statusConfig?.[value]?.text || value}{' '}
+                              {displayValue}
                               <span className="text-muted-foreground ms-2 text-xs">
-                                {statusCounts.get(value) || 0}
+                                {count}
                               </span>
                             </Label>
                           </div>
-                        ))
-                      ) : (
-                        <div className="text-muted-foreground text-sm">
-                          Aucun statut disponible
-                        </div>
-                      )}
+                        );
+                      })}
                     </div>
                   </div>
                 </PopoverContent>
               </Popover>
             )}
-          {/* Toggle columns visibility */}
+          
+          {/* Column Visibility Toggle Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
-                <Columns3Icon
-                  className="-ms-1 opacity-60"
-                  size={16}
-                  aria-hidden="true"
-                />
-                Colonne
+                <Columns3Icon className="-ms-1 opacity-60" size={16} aria-hidden="true" />
+                Colonnes
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Colonnes visibles</DropdownMenuLabel>
               {table
                 .getAllColumns()
-                .filter(
-                  (column) => column.getCanHide() && column.id !== 'actions'
-                )
+                .filter(column => column.getCanHide() && column.id !== 'actions') 
                 .map((column) => {
-                  // Récupérer le nom de la colonne depuis la configuration
-                  const columnConfig = columns.find(
-                    (col) => col.key === column.id
-                  );
+                  const columnConfig = columns.find(col => col.key === column.id);
                   const columnName = columnConfig?.header || column.id;
-
                   return (
                     <DropdownMenuCheckboxItem
                       key={column.id}
                       className="capitalize"
                       checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
-                        column.toggleVisibility(!!value)
-                      }
-                      onSelect={(event) => event.preventDefault()}
+                      onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                      onSelect={(event) => event.preventDefault()} 
                     >
                       {columnName}
                     </DropdownMenuCheckboxItem>
@@ -432,49 +464,38 @@ export function BaseTable<T extends TableData>({
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <div className="flex items-center gap-3">
-          {/* Delete button */}
-          {table.getSelectedRowModel().rows.length > 0 && (
+
+        {/* Bulk Delete Action */}
+        <div className="flex items-center gap-3 mt-3 sm:mt-0">
+          {onDelete && table.getSelectedRowModel().rows.length > 0 && (
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button className="ml-auto" variant="outline">
-                  <TrashIcon
-                    className="-ms-1 opacity-60"
-                    size={16}
-                    aria-hidden="true"
-                  />
-                  Delete
-                  <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
+                <Button variant="outline" className="text-destructive hover:text-destructive-foreground hover:bg-destructive border-destructive"> 
+                  <TrashIcon className="-ms-1 opacity-80" size={16} aria-hidden="true" />
+                  Supprimer
+                  <span className="bg-background text-muted-foreground group-hover:text-destructive-foreground -me-1 ml-2 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
                     {table.getSelectedRowModel().rows.length}
                   </span>
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <div className="flex flex-col gap-2 max-sm:items-center sm:flex-row sm:gap-4">
-                  <div
-                    className="flex size-9 shrink-0 items-center justify-center rounded-full border"
-                    aria-hidden="true"
-                  >
-                    <CircleAlertIcon className="opacity-80" size={16} />
+                  <div className="flex size-9 shrink-0 items-center justify-center rounded-full border border-destructive bg-destructive/10 text-destructive" aria-hidden="true">
+                    <CircleAlertIcon size={16} />
                   </div>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Are you absolutely sure?
-                    </AlertDialogTitle>
+                    <AlertDialogTitle>Êtes-vous sûr de vouloir continuer ?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete{' '}
-                      {table.getSelectedRowModel().rows.length} selected{' '}
-                      {table.getSelectedRowModel().rows.length === 1
-                        ? 'row'
-                        : 'rows'}
-                      .
+                      Cette action est irréversible. Cela supprimera définitivement{' '}
+                      {table.getSelectedRowModel().rows.length}
+                      {table.getSelectedRowModel().rows.length === 1 ? ' élément sélectionné.' : ' éléments sélectionnés.'}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                 </div>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleDeleteRows}>
-                    Delete
+                  <AlertDialogCancel>Annuler</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDeleteSelectedRows} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
+                    Supprimer
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -483,35 +504,33 @@ export function BaseTable<T extends TableData>({
         </div>
       </div>
 
-      {/* Tableau */}
-      <div className="rounded-md border">
+      {/* Table Display */}
+      <div className="rounded-md border overflow-x-auto"> 
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} style={{ width: header.getSize() !== 150 ? header.getSize() : undefined }}> 
                     {header.isPlaceholder ? null : header.column.getCanSort() ? (
                       <div
-                        className="flex items-center cursor-pointer select-none"
+                        className="flex items-center cursor-pointer select-none group" // Added group for hover effects on icon
                         onClick={header.column.getToggleSortingHandler()}
+                        onKeyDown={(e) => e.key === 'Enter' && header.column.getToggleSortingHandler()?.(e)} 
+                        role="button" 
+                        tabIndex={0} 
                       >
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                        <span className="ml-10">
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                        <span className="ml-2 opacity-30 group-hover:opacity-80 transition-opacity"> 
                           {{
                             asc: <ChevronUp size={15} />,
                             desc: <ChevronDown size={15} />,
-                          }[header.column.getIsSorted() as string] ?? null}
+                          }[header.column.getIsSorted() as string] ?? <ChevronDown size={15} className="opacity-0 group-hover:opacity-30"/> // Show faint arrow on hover if not sorted
+                        }
                         </span>
                       </div>
                     ) : (
-                      flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )
+                      flexRender(header.column.columnDef.header, header.getContext())
                     )}
                   </TableHead>
                 ))}
@@ -521,25 +540,17 @@ export function BaseTable<T extends TableData>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {
-                        flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        ) as React.ReactNode
-                      }
+                      {flexRender(cell.column.columnDef.cell, cell.getContext()) as ReactNode}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
+                <TableCell colSpan={tableColumns.length} className="h-24 text-center">
                   Aucun résultat trouvé.
                 </TableCell>
               </TableRow>
@@ -548,12 +559,11 @@ export function BaseTable<T extends TableData>({
         </Table>
       </div>
 
-      {/* Pagination */}
-      <div className="flex items-center justify-between gap-8">
-        {/* Sélection du nombre de lignes par page */}
-        <div className="flex items-center gap-3">
-          <Label htmlFor="rows-per-page" className="max-sm:sr-only">
-            Lignes par page
+      {/* Pagination Controls */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-8 py-4">
+        <div className="flex items-center gap-2">
+          <Label htmlFor={`${tableId}-rows-per-page`} className="text-sm whitespace-nowrap text-muted-foreground">
+            Lignes par page:
           </Label>
           <Select
             value={table.getState().pagination.pageSize.toString()}
@@ -562,14 +572,14 @@ export function BaseTable<T extends TableData>({
             }}
           >
             <SelectTrigger
-              id="rows-per-page"
-              className="w-fit whitespace-nowrap"
+              id={`${tableId}-rows-per-page`}
+              className="w-fit whitespace-nowrap h-9 text-sm" 
             >
               <SelectValue placeholder="Nombre de résultats" />
             </SelectTrigger>
-            <SelectContent className="[&_*[role=option]]:ps-2 [&_*[role=option]]:pe-8 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:end-2">
-              {[5, 10, 25, 50].map((pageSize) => (
-                <SelectItem key={pageSize} value={pageSize.toString()}>
+            <SelectContent>
+              {[5, 10, 25, 50, 100].map((pageSize) => (
+                <SelectItem key={pageSize} value={pageSize.toString()} className="text-sm">
                   {pageSize}
                 </SelectItem>
               ))}
@@ -577,86 +587,70 @@ export function BaseTable<T extends TableData>({
           </Select>
         </div>
 
-        {/* Information sur les pages */}
-        <div className="text-muted-foreground flex grow justify-end text-sm whitespace-nowrap">
-          <p
-            className="text-muted-foreground text-sm whitespace-nowrap"
-            aria-live="polite"
-          >
-            <span className="text-foreground">
-              {table.getState().pagination.pageIndex *
-                table.getState().pagination.pageSize +
-                1}
-              -
-              {Math.min(
-                Math.max(
-                  table.getState().pagination.pageIndex *
-                    table.getState().pagination.pageSize +
-                    table.getState().pagination.pageSize,
-                  0
-                ),
-                table.getRowCount()
-              )}
-            </span>{' '}
-            sur{' '}
-            <span className="text-foreground">
-              {table.getRowCount().toString()}
-            </span>
-          </p>
+        <div className="text-muted-foreground text-sm whitespace-nowrap">
+          Page{' '}
+          <span className="text-foreground font-medium">
+            {table.getPageCount() > 0 ? table.getState().pagination.pageIndex + 1 : 0}
+          </span>{' '}
+          sur{' '}
+          <span className="text-foreground font-medium">
+            {table.getPageCount()}
+          </span>
+          <span className="mx-2 hidden sm:inline">|</span>
+          <span className="text-foreground font-medium mt-2 sm:mt-0 inline-block">
+            {table.getGlobalFacetedRowModel().rows.length}
+          </span>
+          {' résultats'}
         </div>
 
-        {/* Boutons de pagination */}
-        <div>
+
+        <div className="flex items-center space-x-1">
           <Pagination>
             <PaginationContent>
-              {/* Bouton première page */}
               <PaginationItem>
                 <Button
                   size="icon"
                   variant="outline"
-                  className="disabled:pointer-events-none disabled:opacity-50"
                   onClick={() => table.firstPage()}
                   disabled={!table.getCanPreviousPage()}
                   aria-label="Aller à la première page"
+                  className="h-9 w-9" 
                 >
                   <ChevronFirst size={16} aria-hidden="true" />
                 </Button>
               </PaginationItem>
-              {/* Bouton page précédente */}
               <PaginationItem>
                 <Button
                   size="icon"
                   variant="outline"
-                  className="disabled:pointer-events-none disabled:opacity-50"
                   onClick={() => table.previousPage()}
                   disabled={!table.getCanPreviousPage()}
                   aria-label="Aller à la page précédente"
+                  className="h-9 w-9"
                 >
                   <ChevronLeft size={16} aria-hidden="true" />
                 </Button>
               </PaginationItem>
-              {/* Bouton page suivante */}
               <PaginationItem>
                 <Button
                   size="icon"
                   variant="outline"
-                  className="disabled:pointer-events-none disabled:opacity-50"
                   onClick={() => table.nextPage()}
                   disabled={!table.getCanNextPage()}
                   aria-label="Aller à la page suivante"
+                  className="h-9 w-9"
                 >
                   <ChevronRight size={16} aria-hidden="true" />
                 </Button>
               </PaginationItem>
-              {/* Bouton dernière page */}
               <PaginationItem>
                 <Button
                   size="icon"
                   variant="outline"
-                  className="disabled:pointer-events-none disabled:opacity-50"
                   onClick={() => table.lastPage()}
                   disabled={!table.getCanNextPage()}
                   aria-label="Aller à la dernière page"
+                  className="h-9 w-9"
                 >
                   <ChevronLast size={16} aria-hidden="true" />
                 </Button>
@@ -667,4 +661,4 @@ export function BaseTable<T extends TableData>({
       </div>
     </div>
   );
-}
+};

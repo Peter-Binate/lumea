@@ -30,17 +30,17 @@ export default function AddTourPage() {
   }, []);
 
   const handleFileChange = useCallback(
-    (files: File[]) => {
-      if (files && files.length > 0 && files[0] instanceof File) {
-        console.log('Fichier sélectionné:', files[0].name); // Pour débogage
-        updateFormData({ file: files[0] });
-      } else {
-        console.warn('Aucun fichier valide reçu');
-        updateFormData({ file: undefined });
-      }
-    },
-    [updateFormData]
-  );
+  (file: File | null) => {
+    if (file instanceof File) {
+      console.log('Fichier sélectionné:', file.name);
+      updateFormData({ file: file });
+    } else { 
+      console.warn('Aucun fichier valide reçu ou fichier supprimé');
+      updateFormData({ file: undefined });
+    }
+  },
+  [updateFormData] // La dépendance est correcte
+);
 
   const validateForm = useCallback((): boolean => {
     // Réinitialiser toute erreur précédente
@@ -226,9 +226,8 @@ export default function AddTourPage() {
                 Fichier vidéo
               </h2>
               <MediaUploader
-                onFilesUpdated={handleFileChange}
-                maxFiles={1}
-                acceptedFileTypes={['.mp4', '.mov', '.webm']}
+                onFileUpdated={handleFileChange}
+                acceptedFileTypes={{ 'video/*': ['.mp4', '.mov', '.webm'] }}
               />
               {formData.file && renderFilePreview()}
             </div>

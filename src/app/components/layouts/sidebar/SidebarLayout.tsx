@@ -93,8 +93,8 @@ const SidebarLayout: React.FC<ISidebarLayout> = ({
           {/* Header mobile */}
           <div className="flex justify-between items-center p-4 border-b">
             <Image
-              src="/images/strata_logo.png"
-              alt="Logo Strata"
+              src="/images/lumea_logo.png"
+              alt="Logo Lumea"
               width={225}
               height={32.35}
               className="object-cover"
@@ -184,9 +184,9 @@ const SidebarLayout: React.FC<ISidebarLayout> = ({
             {isSidebarExpanded ? (
               <div className="mt-8 relative pb-2">
                 <Image
-                  src="/images/strata_logo.png"
-                  alt="Logo Strata"
-                  width={225}
+                  src="/images/lumea_logo.png"
+                  alt="Logo Lumea"
+                  width={160}
                   height={32.35}
                   className="object-cover"
                 />
@@ -194,10 +194,10 @@ const SidebarLayout: React.FC<ISidebarLayout> = ({
             ) : (
               <div className="mt-8 relative mx-auto">
                 <Image
-                  src="/images/strata_logo_icon.png"
-                  alt="Icon Logo Strata"
-                  width={20}
-                  height={16}
+                  src="/images/lumea_logo_icon.png"
+                  alt="Icon Logo Lumea"
+                  width={30}
+                  height={26}
                   className="object-cover"
                 />
               </div>

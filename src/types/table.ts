@@ -1,50 +1,63 @@
-import { FilterFn } from '@tanstack/react-table';
+import type { FilterFn } from '@tanstack/react-table';
+import type { ReactNode } from 'react';
 
-// Type générique pour les données de la table
+// Generic type for data used in the table.
 export type TableData = {
   id: string;
-  title: string;
-  description: string;
-  created_at: string | Date;
+  title?: string;
+  description?: string;
+  created_at?: string | Date;
   status?: string | number;
   [key: string]: any;
 };
 
-// Configuration des colonnes
-export interface Column<T extends TableData> {
-  key: keyof T;
+// Configuration for a single column in the table
+export type Column<T extends TableData> = {
+  key: keyof T | 'actions';
   header: string;
-  render?: (value: any) => React.ReactNode;
-}
+  render?: (value: any, row: T) => ReactNode;
+};
 
-// Props de base pour la table
-export interface BaseTableProps<T extends TableData> {
+// Configuration for status display (text and CSS class)
+export type StatusConfigItem = {
+  text: string;
+  className: string;
+};
+export type StatusConfig = Record<string | number, StatusConfigItem>;
+
+
+// Props for the BaseTable component
+export type BaseTableProps<T extends TableData> = {
   data: T[];
   columns: Column<T>[];
   onDelete?: (id: string) => void;
   onEdit?: (item: T) => void;
   onView?: (item: T) => void;
-  statusConfig?: Record<string | number, { text: string; className: string }>;
-}
+  statusConfig?: StatusConfig;
+};
 
-// Filtres
-export const multiColumnFilterFn: FilterFn<TableData> = (
+export const multiColumnTextSearchFilterFn: FilterFn<TableData> = (
   row,
   _columnId,
   filterValue
 ) => {
-  const searchableRowContent =
-    `${row.original.title} ${row.original.description}`.toLowerCase();
-  const searchTerm = (filterValue ?? '').toLowerCase();
+  const searchTerm = String(filterValue).toLowerCase();
+  if (!searchTerm) return true;
+
+  const title = String(row.original.title || '').toLowerCase();
+  const description = String(row.original.description || '').toLowerCase();
+  const searchableRowContent = `${title} ${description}`;
+  
   return searchableRowContent.includes(searchTerm);
 };
 
-export const statusFilterFn: FilterFn<TableData> = (
+export const exampleStatusFilterFn: FilterFn<TableData> = (
   row,
   columnId,
   filterValue: string[]
 ) => {
   if (!filterValue?.length) return true;
-  const status = row.getValue(columnId) as string;
-  return filterValue.includes(status);
+  const status = row.getValue(columnId);
+  if (status === null || typeof status === 'undefined') return false;
+  return filterValue.includes(String(status));
 };
